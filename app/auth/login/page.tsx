@@ -35,9 +35,9 @@ export default function LoginPage() {
       if (res.ok && data.success) {
         console.log('Connexion réussie, redirection...')
         console.log('Données reçues:', data)
-        // Attendre un peu plus longtemps pour que le cookie soit bien défini
-        await new Promise(resolve => setTimeout(resolve, 500))
-        // Forcer un refresh complet pour que les cookies soient bien pris en compte
+        // Attendre un peu pour que le cookie soit bien défini
+        await new Promise(resolve => setTimeout(resolve, 200))
+        // Utiliser window.location pour forcer un rechargement complet et prendre en compte les cookies
         window.location.href = '/dashboard'
       } else {
         console.error('Erreur de connexion:', data)

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "./node_modules/.bin/next dev -p 3010",
     "dev:tunnel": "next dev --hostname 0.0.0.0",
     "build": "next build",
     "start": "next start",
@@ -17,7 +17,7 @@
     "db:clear-notifications": "tsx prisma/clear-notifications.ts",
     "db:fix-interventions": "tsx prisma/fix-interventions.ts",
     "db:add-coordinates": "tsx prisma/add-fake-coordinates.ts",
-    "tunnel": "cloudflared tunnel --url http://localhost:3000"
+    "tunnel": "cloudflared tunnel --url http://localhost:3010"
   },
   "dependencies": {
     "@prisma/client": "^5.7.1",

@@ -47,15 +47,19 @@ export async function POST(request: Request) {
     })
 
     // Définir le cookie dans la réponse
-    response.cookies.set('artisanId', artisan.id, {
+    const cookieOptions = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      secure: false, // Désactivé en développement pour permettre HTTP
+      sameSite: 'lax' as const,
       maxAge: 60 * 60 * 24 * 7, // 7 jours
-      path: '/',
-    })
+      path: '/', // Important : définir le chemin
+    }
+    
+    response.cookies.set('artisanId', artisan.id, cookieOptions)
     
     console.log('✅ Cookie défini pour artisan:', artisan.id)
+    console.log('✅ Options du cookie:', cookieOptions)
+    console.log('✅ Headers de la réponse:', Object.fromEntries(response.headers.entries()))
 
     return response
   } catch (error) {

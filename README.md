@@ -18,7 +18,8 @@ Une application web moderne et élégante pour gérer l'activité des plombiers,
 - **Tailwind CSS** - Styling moderne
 - **Framer Motion** - Animations fluides
 - **Prisma** - ORM pour la base de données
-- **SQLite** - Base de données (facilement migrable vers PostgreSQL)
+- **PostgreSQL** - Base de données (hébergée sur Supabase)
+- **Supabase** - Backend as a Service (base de données PostgreSQL)
 
 ## 📦 Installation
 
@@ -29,8 +30,8 @@ npm install
 
 2. Configurer la base de données :
 ```bash
-# Créer le fichier .env
-cp .env.example .env
+# Créer le fichier .env avec vos identifiants Supabase
+# Voir la section Configuration ci-dessous
 
 # Générer le client Prisma
 npm run db:generate
@@ -39,12 +40,24 @@ npm run db:generate
 npm run db:push
 ```
 
+### Configuration Supabase
+
+1. Créer un compte sur [Supabase](https://supabase.com)
+2. Créer un nouveau projet
+3. Dans le fichier `.env`, ajouter :
+```env
+DATABASE_URL="postgresql://postgres:[PASSWORD]@db.[PROJECT_REF].supabase.co:5432/postgres"
+NEXT_PUBLIC_SUPABASE_URL="https://[PROJECT_REF].supabase.co"
+NEXT_PUBLIC_SUPABASE_ANON_KEY="your-anon-key"
+SUPABASE_SERVICE_ROLE_KEY="your-service-role-key"
+```
+
 3. Lancer le serveur de développement :
 ```bash
 npm run dev
 ```
 
-4. Ouvrir [http://localhost:3000](http://localhost:3000)
+4. Ouvrir [http://localhost:3010](http://localhost:3010)
 
 ## 🎨 Design
 
