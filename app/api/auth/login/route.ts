@@ -4,8 +4,6 @@ import { compare } from 'bcryptjs'
 
 export const dynamic = 'force-dynamic'
 
-export const dynamic = 'force-dynamic'
-
 export async function POST(request: Request) {
   try {
     console.log('=== LOGIN ATTEMPT ===')
