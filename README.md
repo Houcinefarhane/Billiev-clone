@@ -43,13 +43,15 @@ npm run db:push
 
 1. Créer un compte sur [Supabase](https://supabase.com)
 2. Créer un nouveau projet
-3. Dans le fichier `.env`, ajouter :
+3. Créer un fichier `.env` à la racine du projet (copier depuis `.env.example` si disponible) et ajouter vos identifiants Supabase :
 ```env
-DATABASE_URL="postgresql://postgres:[PASSWORD]@db.[PROJECT_REF].supabase.co:5432/postgres"
+DATABASE_URL="postgresql://postgres:[VOTRE_MOT_DE_PASSE]@db.[PROJECT_REF].supabase.co:5432/postgres"
 NEXT_PUBLIC_SUPABASE_URL="https://[PROJECT_REF].supabase.co"
-NEXT_PUBLIC_SUPABASE_ANON_KEY="your-anon-key"
-SUPABASE_SERVICE_ROLE_KEY="your-service-role-key"
+NEXT_PUBLIC_SUPABASE_ANON_KEY="votre-anon-key"
+SUPABASE_SERVICE_ROLE_KEY="votre-service-role-key"
 ```
+
+**IMPORTANT** : Le fichier `.env` est dans `.gitignore` et ne sera jamais commité sur GitHub. Toutes les données sensibles restent uniquement sur Supabase et dans votre fichier `.env` local.
 
 3. Lancer le serveur de développement :
 ```bash

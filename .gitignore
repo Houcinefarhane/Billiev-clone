@@ -24,9 +24,14 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# local env files
-.env*.local
+# local env files - CRITIQUE : Ne jamais commiter les fichiers .env
 .env
+.env.local
+.env.development
+.env.production
+.env.test
+.env*.local
+.env*
 
 # vercel
 .vercel
@@ -52,6 +57,10 @@ next-env.d.ts
 # fichiers de configuration sensibles
 **/config/secrets.*
 **/secrets.*
+**/*secret*
+**/*key*
+**/*credential*
+**/*password*
 
 # logs
 *.log
@@ -85,8 +94,8 @@ out/
 # fichiers d'audit
 AUDIT_SECURITE.md
 
-# scripts de développement avec données sensibles
-# (garder les fichiers mais ne pas exposer d'emails/mots de passe)
-# prisma/check-account.ts
-# prisma/clear-notifications.ts
-# prisma/transfer-data.ts
+# données de production (ne jamais commiter)
+data/
+backup/
+*.sql
+*.dump
