@@ -58,8 +58,8 @@ export async function POST(request: Request) {
       )
     }
 
-    // Vérifier que l'email est vérifié (sauf en développement si SKIP_EMAIL_VERIFICATION est activé)
-    const skipVerification = process.env.SKIP_EMAIL_VERIFICATION === 'true' && process.env.NODE_ENV === 'development'
+    // Vérifier que l'email est vérifié (sauf si SKIP_EMAIL_VERIFICATION est activé)
+    const skipVerification = process.env.SKIP_EMAIL_VERIFICATION === 'true'
     
     if (!artisan.emailVerified && !skipVerification) {
       return NextResponse.json(
@@ -72,13 +72,13 @@ export async function POST(request: Request) {
       )
     }
     
-    // En développement, marquer automatiquement comme vérifié si skip activé
+    // Marquer automatiquement comme vérifié si skip activé
     if (!artisan.emailVerified && skipVerification) {
       await prisma.artisan.update({
         where: { id: artisan.id },
         data: { emailVerified: true },
       })
-      console.log(' Mode développement: Email automatiquement vérifié pour:', artisan.email)
+      console.log('Email automatiquement vérifié pour:', artisan.email)
     }
 
     // Créer un cookie de session (simplifié - dans un vrai projet, utiliser JWT)
@@ -92,13 +92,14 @@ export async function POST(request: Request) {
     })
 
     // Définir le cookie dans la réponse
+    const isProduction = process.env.NODE_ENV === 'production'
     const cookieOptions = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // HTTPS en production
+      secure: isProduction, // HTTPS en production
       sameSite: 'lax' as const,
       maxAge: 60 * 60 * 24 * 7, // 7 jours
       path: '/', // Important : définir le chemin
-      domain: process.env.NODE_ENV === 'production' ? undefined : undefined, // Pas de domaine pour permettre tous les sous-domaines
+      // Ne pas définir de domaine pour permettre tous les sous-domaines Netlify
     }
     
     response.cookies.set('artisanId', artisan.id, cookieOptions)
