@@ -4,6 +4,8 @@ import { compare } from 'bcryptjs'
 
 export const dynamic = 'force-dynamic'
 
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: Request) {
   try {
     console.log('=== LOGIN ATTEMPT ===')
@@ -142,33 +144,51 @@ export async function POST(request: Request) {
 
     return response
   } catch (error: any) {
-    console.error('Login error:', error)
-    console.error('Error details:', {
-      message: error?.message,
-      stack: error?.stack,
-      name: error?.name,
-      code: error?.code,
-    })
+    console.error('=== ERREUR LOGIN ===')
+    console.error('Type:', error?.constructor?.name)
+    console.error('Message:', error?.message)
+    console.error('Stack:', error?.stack)
+    console.error('Name:', error?.name)
+    console.error('Code:', error?.code)
     
-    // Retourner un message d'erreur plus détaillé en développement, mais toujours logger en production
+    // Vérifier si c'est une erreur Prisma
+    if (error?.code === 'P1001' || error?.message?.includes('Can\'t reach database server')) {
+      console.error('ERREUR: Impossible de se connecter à la base de données')
+      return NextResponse.json(
+        { error: 'Erreur de connexion à la base de données. Vérifiez votre configuration.' },
+        { status: 500 }
+      )
+    }
+    
+    // Vérifier si c'est une erreur de format DATABASE_URL
+    if (error?.message?.includes('did not match the expected pattern') || 
+        error?.message?.includes('Invalid connection string')) {
+      console.error('ERREUR: Format DATABASE_URL invalide')
+      return NextResponse.json(
+        { error: 'Configuration de la base de données invalide.' },
+        { status: 500 }
+      )
+    }
+    
+    // Retourner un message d'erreur plus détaillé en développement
     const isDevelopment = process.env.NODE_ENV === 'development'
     const errorMessage = isDevelopment
       ? `Erreur lors de la connexion: ${error?.message || 'Erreur inconnue'}`
-      : 'Erreur lors de la connexion'
+      : 'Erreur lors de la connexion. Veuillez réessayer.'
     
-    // Logger l'erreur complète pour le debugging en production
-    if (!isDevelopment) {
-      console.error('Erreur de connexion en production:', {
-        message: error?.message,
-        name: error?.name,
-        code: (error as any)?.code,
-      })
-    }
+    // Logger l'erreur complète pour le debugging
+    console.error('Erreur complète:', JSON.stringify(error, Object.getOwnPropertyNames(error), 2))
     
     return NextResponse.json(
-      { error: errorMessage },
+      { 
+        error: errorMessage,
+        // En développement, inclure plus de détails
+        ...(isDevelopment && { details: error?.message, stack: error?.stack })
+      },
       { status: 500 }
     )
+  } finally {
+    console.log('=== FIN LOGIN ===')
   }
 }
 
