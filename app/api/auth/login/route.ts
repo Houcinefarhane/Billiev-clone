@@ -2,13 +2,19 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { compare } from 'bcryptjs'
 
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: Request) {
   try {
-    console.log('Login attempt - Début')
+    console.log('=== LOGIN ATTEMPT ===')
+    console.log('NODE_ENV:', process.env.NODE_ENV)
+    console.log('SKIP_EMAIL_VERIFICATION:', process.env.SKIP_EMAIL_VERIFICATION)
+    
     const body = await request.json()
     const { email, password } = body
 
-    console.log('Login attempt - Email:', email)
+    console.log('Email reçu:', email ? 'Oui' : 'Non')
+    console.log('Password reçu:', password ? 'Oui' : 'Non')
 
     if (!email || !password) {
       return NextResponse.json(
@@ -18,17 +24,31 @@ export async function POST(request: Request) {
     }
 
     // Trouver l'artisan
-    console.log('Login attempt - Recherche artisan dans la base de données...')
+    console.log('Recherche artisan dans la base de données...')
     let artisan
     try {
+      const emailNormalized = email.toLowerCase().trim()
+      console.log('Email normalisé:', emailNormalized)
+      
       artisan = await prisma.artisan.findUnique({
-        where: { email: email.toLowerCase().trim() },
+        where: { email: emailNormalized },
       })
-      console.log('Login attempt - Artisan trouvé:', artisan ? 'Oui' : 'Non')
+      
+      console.log('Artisan trouvé:', artisan ? `Oui (ID: ${artisan.id}, Email vérifié: ${artisan.emailVerified})` : 'Non')
+      
+      if (!artisan) {
+        // Essayer de trouver tous les emails pour debug
+        const allArtisans = await prisma.artisan.findMany({
+          select: { email: true, emailVerified: true },
+          take: 5,
+        })
+        console.log('Emails dans la base (premiers 5):', allArtisans.map(a => ({ email: a.email, verified: a.emailVerified })))
+      }
     } catch (dbError: any) {
-      console.error('Erreur de connexion à la base de données:', dbError)
-      console.error('Message d\'erreur:', dbError?.message)
-      console.error('Code d\'erreur:', dbError?.code)
+      console.error('=== ERREUR BASE DE DONNÉES ===')
+      console.error('Message:', dbError?.message)
+      console.error('Code:', dbError?.code)
+      console.error('Stack:', dbError?.stack)
       
       // Vérifier si c'est une erreur de format DATABASE_URL
       if (dbError?.message?.includes('did not match the expected pattern') || 
@@ -47,9 +67,15 @@ export async function POST(request: Request) {
     }
 
     // Vérifier le mot de passe
-    console.log('Login attempt - Vérification du mot de passe...')
-    const isValidPassword = await compare(password, artisan.password)
-    console.log('Login attempt - Mot de passe valide:', isValidPassword)
+    console.log('Vérification du mot de passe...')
+    let isValidPassword = false
+    try {
+      isValidPassword = await compare(password, artisan.password)
+      console.log('Mot de passe valide:', isValidPassword)
+    } catch (compareError: any) {
+      console.error('Erreur lors de la comparaison du mot de passe:', compareError?.message)
+      isValidPassword = false
+    }
 
     if (!isValidPassword) {
       return NextResponse.json(
@@ -60,8 +86,11 @@ export async function POST(request: Request) {
 
     // Vérifier que l'email est vérifié (sauf si SKIP_EMAIL_VERIFICATION est activé)
     const skipVerification = process.env.SKIP_EMAIL_VERIFICATION === 'true'
+    console.log('Skip verification:', skipVerification)
+    console.log('Email vérifié:', artisan.emailVerified)
     
     if (!artisan.emailVerified && !skipVerification) {
+      console.log('Email non vérifié et skip désactivé - refus de connexion')
       return NextResponse.json(
         { 
           error: 'Veuillez vérifier votre adresse email avant de vous connecter. Vérifiez votre boîte de réception.',
@@ -74,6 +103,7 @@ export async function POST(request: Request) {
     
     // Marquer automatiquement comme vérifié si skip activé
     if (!artisan.emailVerified && skipVerification) {
+      console.log('Email non vérifié mais skip activé - marquage automatique comme vérifié')
       await prisma.artisan.update({
         where: { id: artisan.id },
         data: { emailVerified: true },
@@ -104,8 +134,11 @@ export async function POST(request: Request) {
     
     response.cookies.set('artisanId', artisan.id, cookieOptions)
     
-    console.log('Cookie défini pour artisan:', artisan.id)
+    console.log('=== CONNEXION RÉUSSIE ===')
+    console.log('Artisan ID:', artisan.id)
+    console.log('Artisan Email:', artisan.email)
     console.log('Options du cookie:', cookieOptions)
+    console.log('Cookie défini avec succès')
 
     return response
   } catch (error: any) {
