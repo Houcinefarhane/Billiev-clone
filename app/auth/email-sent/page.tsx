@@ -1,6 +1,7 @@
 'use client'
 
 import { useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -8,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Mail, ArrowRight } from 'lucide-react'
 import { useState } from 'react'
 
-export default function EmailSentPage() {
+function EmailSentContent() {
   const searchParams = useSearchParams()
   const email = searchParams.get('email') || ''
   const [resending, setResending] = useState(false)
