@@ -34,7 +34,7 @@ function generateRandomCoordinates(city: { lat: number; lng: number }) {
 }
 
 async function main() {
-  console.log('🚀 Ajout de coordonnées GPS fictives aux interventions...')
+  console.log(' Ajout de coordonnées GPS fictives aux interventions...')
 
   // Récupérer toutes les interventions sans coordonnées GPS
   const interventions = await prisma.intervention.findMany({

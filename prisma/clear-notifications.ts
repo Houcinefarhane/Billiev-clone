@@ -33,7 +33,7 @@ async function main() {
     })
     console.log(` ${count} notifications supprimées`)
   } else {
-    console.log('ℹ️  Aucune notification à supprimer')
+    console.log('  Aucune notification à supprimer')
   }
 }
 

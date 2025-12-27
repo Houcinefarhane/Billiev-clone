@@ -77,7 +77,7 @@ async function main() {
   }
   
   console.log(`\n ${updated} interventions corrigées`)
-  console.log(`🗑️  ${deleted} interventions supprimées`)
+  console.log(`  ${deleted} interventions supprimées`)
 }
 
 main()
