@@ -99,3 +99,4 @@ data/
 backup/
 *.sql
 *.dump
+SECURITE_DONNEES.md
