@@ -52,9 +52,10 @@ export default function LoginPage() {
         }
         setLoading(false)
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Login error:', err)
-      setError('Une erreur est survenue')
+      console.error('Error details:', err)
+      setError(err?.message || 'Une erreur est survenue. Vérifiez votre connexion internet.')
       setLoading(false)
     }
   }

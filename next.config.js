@@ -11,18 +11,10 @@ const nextConfig = {
     }
     return config
   },
-  // Essayer de forcer SWC
-  experimental: {
-    forceSwcTransforms: true,
-  },
-  // Désactiver la minification SWC
-  swcMinify: false,
-  // PWA support
-  pwa: {
-    dest: 'public',
-    register: true,
-    skipWaiting: true,
-  },
+  // Configuration expérimentale désactivée pour compatibilité
+  // experimental: {
+  //   forceSwcTransforms: true,
+  // },
 }
 
 module.exports = nextConfig

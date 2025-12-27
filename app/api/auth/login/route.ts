@@ -4,8 +4,11 @@ import { compare } from 'bcryptjs'
 
 export async function POST(request: Request) {
   try {
+    console.log('Login attempt - Début')
     const body = await request.json()
     const { email, password } = body
+
+    console.log('Login attempt - Email:', email)
 
     if (!email || !password) {
       return NextResponse.json(
@@ -15,9 +18,26 @@ export async function POST(request: Request) {
     }
 
     // Trouver l'artisan
-    const artisan = await prisma.artisan.findUnique({
-      where: { email },
-    })
+    console.log('Login attempt - Recherche artisan dans la base de données...')
+    let artisan
+    try {
+      artisan = await prisma.artisan.findUnique({
+        where: { email: email.toLowerCase().trim() },
+      })
+      console.log('Login attempt - Artisan trouvé:', artisan ? 'Oui' : 'Non')
+    } catch (dbError: any) {
+      console.error('Erreur de connexion à la base de données:', dbError)
+      console.error('Message d\'erreur:', dbError?.message)
+      console.error('Code d\'erreur:', dbError?.code)
+      
+      // Vérifier si c'est une erreur de format DATABASE_URL
+      if (dbError?.message?.includes('did not match the expected pattern') || 
+          dbError?.message?.includes('Invalid connection string')) {
+        throw new Error('Format de connexion à la base de données invalide. Vérifiez votre fichier .env (DATABASE_URL)')
+      }
+      
+      throw new Error(`Erreur de connexion à la base de données: ${dbError?.message || 'Erreur inconnue'}`)
+    }
 
     if (!artisan) {
       return NextResponse.json(
@@ -27,7 +47,9 @@ export async function POST(request: Request) {
     }
 
     // Vérifier le mot de passe
+    console.log('Login attempt - Vérification du mot de passe...')
     const isValidPassword = await compare(password, artisan.password)
+    console.log('Login attempt - Mot de passe valide:', isValidPassword)
 
     if (!isValidPassword) {
       return NextResponse.json(
@@ -85,10 +107,21 @@ export async function POST(request: Request) {
     console.log('Options du cookie:', cookieOptions)
 
     return response
-  } catch (error) {
+  } catch (error: any) {
     console.error('Login error:', error)
+    console.error('Error details:', {
+      message: error?.message,
+      stack: error?.stack,
+      name: error?.name,
+    })
+    
+    // Retourner un message d'erreur plus détaillé en développement
+    const errorMessage = process.env.NODE_ENV === 'development' 
+      ? `Erreur lors de la connexion: ${error?.message || 'Erreur inconnue'}`
+      : 'Erreur lors de la connexion'
+    
     return NextResponse.json(
-      { error: 'Erreur lors de la connexion' },
+      { error: errorMessage },
       { status: 500 }
     )
   }

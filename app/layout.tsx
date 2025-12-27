@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Space_Grotesk } from 'next/font/google'
+import { viewport } from './viewport'
 import './globals.css'
 
 const spaceGrotesk = Space_Grotesk({ 
@@ -23,7 +24,8 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3010'),
+  // metadataBase temporairement désactivé pour éviter les erreurs
+  // metadataBase: process.env.NEXT_PUBLIC_APP_URL ? new URL(process.env.NEXT_PUBLIC_APP_URL) : undefined,
   alternates: {
     canonical: '/',
   },
@@ -52,14 +54,6 @@ export const metadata: Metadata = {
     },
   },
   manifest: '/manifest.json',
-  themeColor: '#96B9DC',
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-    viewportFit: 'cover',
-  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
