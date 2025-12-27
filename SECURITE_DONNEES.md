@@ -2,7 +2,7 @@
 
 ## Principe Fondamental
 
-**Toutes les données sensibles doivent être stockées uniquement sur Supabase et dans le fichier `.env` local. Aucune donnée réelle ne doit être visible sur GitHub.**
+Toutes les données sensibles doivent être stockées uniquement sur Supabase et dans le fichier `.env` local. Aucune donnée réelle ne doit être visible sur GitHub.
 
 ## Fichiers Protégés
 
@@ -15,9 +15,9 @@ Le fichier `.gitignore` protège automatiquement :
 
 ## Configuration
 
-1. **Ne jamais** commiter le fichier `.env` avec de vraies valeurs
-2. **Toujours** utiliser des variables d'environnement pour les données sensibles
-3. **Vérifier** avant chaque commit qu'aucune donnée réelle n'est dans le code
+1. Ne jamais commiter le fichier `.env` avec de vraies valeurs
+2. Toujours utiliser des variables d'environnement pour les données sensibles
+3. Vérifier avant chaque commit qu'aucune donnée réelle n'est dans le code
 
 ## Variables d'Environnement Requises
 
@@ -32,9 +32,24 @@ Toutes ces variables doivent être dans `.env` (jamais dans le code) :
 - `STRIPE_SECRET_KEY` - Clé secrète Stripe
 - `STRIPE_WEBHOOK_SECRET` - Secret webhook Stripe
 
-## Vérification Avant Commit
+## Protection Automatique
 
-Avant de commiter, vérifier :
+Un hook Git pre-commit bloque automatiquement les commits contenant des données sensibles :
+- URLs de base de données réelles (Supabase)
+- Clés API (Stripe, Resend)
+- Fichiers .env
+- Mots de passe en dur
+
+Pour installer le hook :
+```bash
+bash scripts/setup-git-hooks.sh
+```
+
+Le hook s'exécute automatiquement avant chaque commit et empêche le commit si des données sensibles sont détectées.
+
+## Vérification Manuelle (si besoin)
+
+Si vous voulez vérifier manuellement avant de commiter :
 ```bash
 # Chercher des URLs de base de données
 git diff | grep -i "postgresql://"
@@ -52,4 +67,3 @@ Si vous avez accidentellement commité des données sensibles :
 1. Ne pas paniquer
 2. Changer immédiatement les credentials compromis sur Supabase/Stripe/Resend
 3. Utiliser `git filter-branch` ou `git filter-repo` pour nettoyer l'historique (avancé)
-
