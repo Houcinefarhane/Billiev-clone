@@ -1,7 +1,8 @@
 import { PrismaClient } from '@prisma/client'
 
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined
+declare global {
+  // eslint-disable-next-line no-var
+  var prisma: PrismaClient | undefined
 }
 
 // Fonction pour valider et nettoyer DATABASE_URL
@@ -39,16 +40,15 @@ function validateDatabaseUrl(url: string | undefined): string {
   return cleanUrl
 }
 
-// Ne pas valider/créer pendant le build - seulement au runtime
 // Détecter si on est en phase de build
 const isBuildTime = process.env.NEXT_PHASE === 'phase-production-build' || 
-                     process.env.NODE_ENV === 'production' && !process.env.DATABASE_URL
+                     (process.env.NODE_ENV === 'production' && !process.env.DATABASE_URL)
 
-// Créer Prisma Client avec lazy initialization
-if (!globalForPrisma.prisma) {
+// Créer Prisma Client - toujours défini (même pendant le build)
+const prisma: PrismaClient = globalThis.prisma ?? (() => {
   if (isBuildTime) {
     // Pendant le build, créer un client minimal sans validation
-    globalForPrisma.prisma = new PrismaClient({
+    return new PrismaClient({
       log: [],
     })
   } else {
@@ -59,7 +59,7 @@ if (!globalForPrisma.prisma) {
         console.log('DATABASE_URL validé avec succès')
       }
       
-      globalForPrisma.prisma = new PrismaClient({
+      return new PrismaClient({
         log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
       })
     } catch (error: any) {
@@ -72,14 +72,19 @@ if (!globalForPrisma.prisma) {
       console.error('2. Sélectionnez votre projet')
       console.error('3. Settings → Database')
       console.error('4. Copiez la "Connection string" (URI)')
-      // Ne pas throw pendant le build
+      // Ne pas throw pendant le build - créer un client minimal
       if (!isBuildTime) {
         throw error
       }
+      return new PrismaClient({ log: [] })
     }
   }
+})()
+
+// En développement, réutiliser le même client
+if (process.env.NODE_ENV !== 'production') {
+  globalThis.prisma = prisma
 }
 
-const prisma = globalForPrisma.prisma
 export { prisma }
 
