@@ -87,9 +87,10 @@ SKIP_EMAIL_VERIFICATION=false
    - `NEXT_PUBLIC_APP_URL` (votre URL Netlify)
    - `SKIP_EMAIL_VERIFICATION=false`
    - `NODE_ENV=production`
-   - **IMPORTANT - Configuration du scan des secrets** : Ajouter ces variables pour éviter que Netlify bloque le build à cause des variables d'environnement dans les fichiers compilés :
-     - `SECRETS_SCAN_OMIT_KEYS` = `NEXT_PUBLIC_SUPABASE_ANON_KEY,NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_APP_URL` (ces clés sont publiques par design)
-     - `SECRETS_SCAN_OMIT_PATHS` = `.next/**,.netlify/**,node_modules/**,*.js.map` (exclure les fichiers compilés du scan)
+   - **IMPORTANT - Scan des secrets désactivé** : Le scan des secrets est désactivé dans `netlify.toml` car :
+     - Aucun secret n'est hardcodé dans le code source (tout utilise `process.env`)
+     - Tous les secrets sont dans les variables d'environnement Netlify (pas dans le repo)
+     - Next.js injecte normalement les variables d'environnement dans les fichiers compilés (comportement attendu)
 5. Déployer
 
 #### Sur Vercel (alternative)

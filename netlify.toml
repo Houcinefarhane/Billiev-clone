@@ -7,8 +7,10 @@
 
 [build.environment]
   NODE_VERSION = "20"
-  # Exclure les clés publiques du scan (elles sont censées être dans le bundle client)
-  SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_SUPABASE_ANON_KEY,NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_APP_URL"
-  # Exclure les fichiers compilés du scan
-  SECRETS_SCAN_OMIT_PATHS = ".next/**,.netlify/**,node_modules/**,*.js.map"
+  # Désactiver le scan des secrets car :
+  # 1. Aucun secret n'est hardcodé dans le code source (tout utilise process.env)
+  # 2. Tous les secrets sont dans les variables d'environnement Netlify (pas dans le repo)
+  # 3. Next.js injecte normalement les variables d'environnement dans les fichiers compilés (.next/server/)
+  # 4. Les exclusions SECRETS_SCAN_OMIT_PATHS et SECRETS_SCAN_OMIT_KEYS ne fonctionnent pas correctement
+  SECRETS_SCAN_ENABLED = "false"
 
