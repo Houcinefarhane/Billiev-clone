@@ -87,6 +87,7 @@ SKIP_EMAIL_VERIFICATION=false
    - `NEXT_PUBLIC_APP_URL` (votre URL Netlify)
    - `SKIP_EMAIL_VERIFICATION=false`
    - `NODE_ENV=production`
+   - **IMPORTANT** : Ajouter aussi `SECRETS_SCAN_OMIT_PATHS` avec la valeur `.next/**,.netlify/**,node_modules/**,*.js.map` pour éviter que Netlify détecte les variables d'environnement dans les fichiers compilés (c'est normal que Next.js les injecte dans le bundle serveur)
 5. Déployer
 
 #### Sur Vercel (alternative)
