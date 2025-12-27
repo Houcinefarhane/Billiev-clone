@@ -91,12 +91,15 @@ build/
 out/
 .next/
 
-# fichiers d'audit
+# fichiers d'audit et documentation
 AUDIT_SECURITE.md
+CHECKLIST_DEPLOIEMENT.md
+SECURITE_DONNEES.md
+*.md
+!README.md
 
 # données de production (ne jamais commiter)
 data/
 backup/
 *.sql
 *.dump
-SECURITE_DONNEES.md

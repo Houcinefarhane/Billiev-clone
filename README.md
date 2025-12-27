@@ -50,15 +50,31 @@ npm run db:push
 
 1. Créer un compte sur [Supabase](https://supabase.com)
 2. Créer un nouveau projet
-3. Créer un fichier `.env` à la racine du projet (copier depuis `.env.example` si disponible) et ajouter vos identifiants Supabase :
+3. Créer un fichier `.env` à la racine du projet et ajouter vos identifiants Supabase :
 ```env
-DATABASE_URL="postgresql://postgres:[VOTRE_MOT_DE_PASSE]@db.[PROJECT_REF].supabase.co:5432/postgres"
-NEXT_PUBLIC_SUPABASE_URL="https://[PROJECT_REF].supabase.co"
-NEXT_PUBLIC_SUPABASE_ANON_KEY="votre-anon-key"
-SUPABASE_SERVICE_ROLE_KEY="votre-service-role-key"
+DATABASE_URL=postgresql://postgres:[VOTRE_MOT_DE_PASSE]@db.[PROJECT_REF].supabase.co:5432/postgres
+NEXT_PUBLIC_SUPABASE_URL=https://[PROJECT_REF].supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=votre-anon-key
+SUPABASE_SERVICE_ROLE_KEY=votre-service-role-key
+NEXTAUTH_SECRET=générez-une-clé-secrète-avec-openssl-rand-base64-32
+NEXTAUTH_URL=http://localhost:3010
+RESEND_API_KEY=votre-clé-api-resend
+RESEND_FROM_EMAIL=noreply@votredomaine.com
+NEXT_PUBLIC_APP_URL=http://localhost:3010
+SKIP_EMAIL_VERIFICATION=false
 ```
 
 **IMPORTANT** : Le fichier `.env` est dans `.gitignore` et ne sera jamais commité sur GitHub. Toutes les données sensibles restent uniquement sur Supabase et dans votre fichier `.env` local.
+
+### Déploiement
+
+Pour déployer sur Vercel ou une autre plateforme :
+
+1. Connecter votre dépôt GitHub à votre plateforme de déploiement
+2. Configurer toutes les variables d'environnement (voir `.env.production.example`)
+3. Générer `NEXTAUTH_SECRET` : `openssl rand -base64 32`
+4. Configurer `NEXTAUTH_URL` avec votre domaine de production
+5. Le build se fera automatiquement lors du déploiement
 
 3. Lancer le serveur de développement :
 ```bash
