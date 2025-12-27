@@ -118,3 +118,20 @@ function EmailSentContent() {
   )
 }
 
+export default function EmailSentPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="border border-border bg-card shadow-xl">
+          <CardContent className="p-8 text-center">
+            <Mail className="w-8 h-8 text-primary mx-auto mb-4" />
+            <p className="text-muted-foreground">Chargement...</p>
+          </CardContent>
+        </Card>
+      </div>
+    }>
+      <EmailSentContent />
+    </Suspense>
+  )
+}
+
