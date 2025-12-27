@@ -57,12 +57,13 @@ export function ThemeToggle() {
         size="icon"
         onClick={toggleTheme}
         className="w-9 h-9 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-        aria-label="Changer de thème"
+        aria-label={theme === 'dark' ? 'Passer au thème clair' : 'Passer au thème sombre'}
+        aria-pressed={theme === 'dark'}
       >
         {theme === 'dark' ? (
-          <Sun className="w-4 h-4" />
+          <Sun className="w-4 h-4" aria-hidden="true" />
         ) : (
-          <Moon className="w-4 h-4" />
+          <Moon className="w-4 h-4" aria-hidden="true" />
         )}
       </Button>
     </motion.div>

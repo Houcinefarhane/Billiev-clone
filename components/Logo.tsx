@@ -20,9 +20,9 @@ export function Logo({ className = '', size = 'md', showText = true }: LogoProps
   }
 
   return (
-    <div className={`flex items-center gap-3 ${className}`}>
-      <div className={`${sizeClasses[size]} rounded-xl bg-primary flex items-center justify-center shadow-lg`}>
-        <Wrench className={`${size === 'sm' ? 'w-4 h-4' : size === 'md' ? 'w-6 h-6' : 'w-8 h-8'} text-primary-foreground`} strokeWidth={2} />
+    <div className={`flex items-center gap-3 ${className}`} role="banner">
+      <div className={`${sizeClasses[size]} rounded-xl bg-primary flex items-center justify-center shadow-lg`} aria-hidden="true">
+        <Wrench className={`${size === 'sm' ? 'w-4 h-4' : size === 'md' ? 'w-6 h-6' : 'w-8 h-8'} text-primary-foreground`} strokeWidth={2} aria-hidden="true" />
       </div>
       {showText && (
         <div>

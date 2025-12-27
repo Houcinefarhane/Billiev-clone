@@ -146,6 +146,108 @@ html {
   z-index: 2 !important;
 }
 
+/* Mobile optimizations */
+@media (max-width: 1023px) {
+  /* Améliorer la lisibilité sur mobile */
+  body {
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Réduire les espacements sur mobile */
+  .space-y-4 > * + * {
+    margin-top: 0.75rem;
+  }
+  
+  /* Améliorer les boutons sur mobile */
+  button, .btn {
+    min-height: 44px; /* Taille tactile recommandée */
+    padding: 0.5rem 1rem;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Améliorer les inputs sur mobile */
+  input, textarea, select {
+    font-size: 16px; /* Évite le zoom automatique sur iOS */
+    min-height: 44px;
+  }
+  
+  /* Optimiser les cartes sur mobile */
+  .card {
+    border-radius: 0.5rem;
+  }
+  
+  /* Améliorer les tableaux sur mobile */
+  table {
+    font-size: 12px;
+  }
+  
+  /* Réduire les marges sur mobile */
+  .container {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+  
+  /* Améliorer le scroll sur iOS */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Optimiser les textes pour mobile */
+  h1, h2, h3, h4, h5, h6 {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  
+  /* Améliorer les liens sur mobile */
+  a {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Touch optimizations */
+@media (hover: none) and (pointer: coarse) {
+  /* Améliorer les zones tactiles */
+  a, button, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Désactiver les effets hover sur mobile */
+  .hover\:bg-muted:hover {
+    background-color: transparent;
+  }
+}
+
+/* iPhone specific optimizations */
+@supports (-webkit-touch-callout: none) {
+  /* iOS Safari specific styles */
+  body {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Améliorer le rendu des polices sur iOS */
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Améliorer le scroll sur iOS */
+  html {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Éviter les problèmes de viewport sur iOS */
+  @media (max-width: 1023px) {
+    body {
+      overflow-x: hidden;
+      width: 100%;
+    }
+  }
+}
+
 /* Print styles */
 @media print {
   @page {

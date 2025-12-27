@@ -16,7 +16,8 @@ import {
   Menu,
   X,
   MapPin,
-  Bell
+  Bell,
+  CreditCard
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useState, useEffect } from 'react'
@@ -35,12 +36,29 @@ const menuItems = [
   { href: '/dashboard/finances', label: 'Finances', icon: TrendingUp },
   { href: '/dashboard/stock', label: 'Stock', icon: Package },
   { href: '/dashboard/notifications', label: 'Notifications', icon: Bell },
+  { href: '/dashboard/abonnement', label: 'Abonnement', icon: CreditCard },
 ]
 
 export function Sidebar() {
   const pathname = usePathname()
   const [isMobileOpen, setIsMobileOpen] = useState(false)
   const [unreadNotifications, setUnreadNotifications] = useState(0)
+  const [isDesktop, setIsDesktop] = useState(false)
+
+  // Détecter si on est sur desktop
+  useEffect(() => {
+    const checkDesktop = () => {
+      setIsDesktop(window.innerWidth >= 1024)
+    }
+    checkDesktop()
+    window.addEventListener('resize', checkDesktop)
+    return () => window.removeEventListener('resize', checkDesktop)
+  }, [])
+
+  // Fermer le menu mobile quand la route change
+  useEffect(() => {
+    setIsMobileOpen(false)
+  }, [pathname])
 
   // Charger le nombre de notifications non lues
   useEffect(() => {
@@ -82,14 +100,17 @@ export function Sidebar() {
   return (
     <>
       {/* Mobile menu button */}
-      <div className="lg:hidden fixed top-4 left-4 z-50">
+      <div className="lg:hidden fixed top-3 left-3 z-50">
         <Button
           variant="ghost"
           size="icon"
           onClick={() => setIsMobileOpen(!isMobileOpen)}
-          className="bg-card/90 backdrop-blur-sm border border-border shadow-lg"
+          className="bg-card/90 backdrop-blur-sm border border-border shadow-lg h-10 w-10"
+          aria-label={isMobileOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+          aria-expanded={isMobileOpen}
+          aria-controls="sidebar-menu"
         >
-          {isMobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          {isMobileOpen ? <X className="w-5 h-5" aria-hidden="true" /> : <Menu className="w-5 h-5" aria-hidden="true" />}
         </Button>
       </div>
 
@@ -99,29 +120,42 @@ export function Sidebar() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="lg:hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
+          className="lg:hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-[45]"
           onClick={() => setIsMobileOpen(false)}
+          onTouchStart={() => setIsMobileOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <motion.aside
         initial={false}
-        animate={{ x: isMobileOpen ? 0 : 0 }}
+        animate={{ 
+          x: isDesktop ? 0 : (isMobileOpen ? 0 : -256)
+        }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
         className={cn(
-          "fixed left-0 top-0 h-full w-64 bg-card/95 backdrop-blur-xl border-r border-border z-50",
-          "lg:translate-x-0",
-          isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+          "fixed left-0 top-0 h-full w-64 bg-card/95 backdrop-blur-xl border-r border-border z-[50]"
         )}
+        id="sidebar-menu"
+        role="navigation"
+        aria-label="Menu principal"
       >
-        <div className="flex flex-col h-full p-6">
+        <div className="flex flex-col h-full p-4 lg:p-6">
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-10"
+            className="mb-6 lg:mb-10 flex items-center justify-between"
           >
             <Logo size="sm" />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsMobileOpen(false)}
+              className="lg:hidden h-8 w-8"
+              aria-label="Fermer le menu"
+            >
+              <X className="w-4 h-4" aria-hidden="true" />
+            </Button>
           </motion.div>
 
           <nav className="flex-1 space-y-1">
@@ -140,21 +174,21 @@ export function Sidebar() {
                     href={item.href}
                     onClick={() => setIsMobileOpen(false)}
                     className={cn(
-                      "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 text-sm font-medium relative",
+                      "flex items-center gap-2 lg:gap-3 px-2 lg:px-3 py-2.5 rounded-lg transition-all duration-200 text-sm font-medium relative min-h-[44px]",
                       isActive
                         ? "bg-primary text-primary-foreground shadow-sm"
                         : "text-muted-foreground hover:bg-muted hover:text-foreground"
                     )}
                   >
-                    <div className="relative">
-                      <Icon className="w-4 h-4" strokeWidth={isActive ? 2.5 : 2} />
+                    <div className="relative flex-shrink-0">
+                      <Icon className="w-5 h-5" strokeWidth={isActive ? 2.5 : 2} />
                       {item.href === '/dashboard/notifications' && unreadNotifications > 0 && (
                         <span className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full flex items-center justify-center text-[10px] font-bold text-white">
                           {unreadNotifications > 9 ? '9+' : unreadNotifications}
                         </span>
                       )}
                     </div>
-                    <span>{item.label}</span>
+                    <span className="truncate">{item.label}</span>
                     {isActive && (
                       <motion.div
                         layoutId="activeIndicator"

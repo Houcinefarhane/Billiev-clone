@@ -135,37 +135,37 @@ export default function DashboardPage() {
   ]
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2 lg:space-y-4">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3"
+        className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-2 lg:gap-3"
       >
         <div>
-          <h1 className="text-3xl font-bold mb-1">Tableau de bord</h1>
-          <p className="text-sm text-muted-foreground">
+          <h1 className="text-xl lg:text-3xl font-bold mb-0.5 lg:mb-1">Tableau de bord</h1>
+          <p className="text-xs lg:text-sm text-muted-foreground">
             Vue d'ensemble de votre activité
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" asChild>
+        <div className="flex gap-1.5 lg:gap-2 flex-wrap w-full lg:w-auto">
+          <Button variant="outline" size="sm" asChild className="text-xs lg:text-sm flex-1 lg:flex-initial">
             <Link href="/dashboard/factures">
-              <FileText className="w-4 h-4 mr-2" />
-              Facture
+              <FileText className="w-3.5 h-3.5 lg:w-4 lg:h-4 mr-1.5 lg:mr-2" />
+              <span>Facture</span>
             </Link>
           </Button>
-          <Button size="sm" asChild>
+          <Button size="sm" asChild className="text-xs lg:text-sm flex-1 lg:flex-initial">
             <Link href="/dashboard/planning">
-              <Calendar className="w-4 h-4 mr-2" />
-              Intervention
+              <Calendar className="w-3.5 h-3.5 lg:w-4 lg:h-4 mr-1.5 lg:mr-2" />
+              <span>Intervention</span>
             </Link>
           </Button>
         </div>
       </motion.div>
 
       {/* Stats Cards - Compact */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-3">
         {statCards.map((stat, index) => {
           const Icon = stat.icon
           return (
@@ -177,30 +177,30 @@ export default function DashboardPage() {
               whileHover={{ y: -5, scale: 1.02 }}
             >
               <Link href={stat.link}>
-                <Card className="border border-border hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer group p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className={`w-10 h-10 rounded-lg ${stat.color} flex items-center justify-center shadow-md group-hover:scale-110 transition-transform`}>
-                      <Icon className="w-5 h-5 text-white" />
+                <Card className="border border-border hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer group p-2.5 lg:p-4">
+                  <div className="flex items-center justify-between mb-1 lg:mb-2">
+                    <div className={`w-9 h-9 lg:w-10 lg:h-10 rounded-lg ${stat.color} flex items-center justify-center shadow-md group-hover:scale-110 transition-transform`}>
+                      <Icon className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
                     </div>
-                    <div className={`flex items-center gap-1 text-xs font-medium ${
+                    <div className={`flex items-center gap-0.5 lg:gap-1 text-[10px] lg:text-xs font-medium ${
                       stat.trend === 'up' ? 'text-success' : 'text-destructive'
                     }`}>
                       {stat.trend === 'up' ? (
-                        <ArrowUpRight className="w-3 h-3" />
+                        <ArrowUpRight className="w-2.5 h-2.5 lg:w-3 lg:h-3" />
                       ) : (
-                        <ArrowDownRight className="w-3 h-3" />
+                        <ArrowDownRight className="w-2.5 h-2.5 lg:w-3 lg:h-3" />
                       )}
-                      <span className="text-xs">{stat.change}</span>
+                      <span className="text-[10px] lg:text-xs">{stat.change}</span>
                     </div>
                   </div>
-                  <CardTitle className="text-xl mb-1">
+                  <CardTitle className="text-sm lg:text-xl mb-0.5 lg:mb-1 leading-tight">
                     {loading ? (
-                      <div className="h-6 w-20 bg-muted animate-pulse rounded"></div>
+                      <div className="h-4 lg:h-6 w-14 lg:w-20 bg-muted animate-pulse rounded"></div>
                     ) : (
                       stat.value
                     )}
                   </CardTitle>
-                  <CardDescription className="text-xs">{stat.description}</CardDescription>
+                  <CardDescription className="text-[9px] lg:text-xs leading-tight">{stat.description}</CardDescription>
                 </Card>
               </Link>
             </motion.div>
@@ -209,7 +209,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Main Content Grid - 5 columns pour plus de flexibilité */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-2 lg:gap-4">
         {/* Opérations en cours - Colonne réduite */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -218,11 +218,11 @@ export default function DashboardPage() {
           className="lg:col-span-2"
         >
           <Card className="border border-border h-full">
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-2 lg:pb-3 p-3 lg:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-base">Opérations en cours</CardTitle>
-                  <CardDescription className="text-xs">Vue d'ensemble</CardDescription>
+                  <CardTitle className="text-sm lg:text-base">Opérations en cours</CardTitle>
+                  <CardDescription className="text-[10px] lg:text-xs">Vue d'ensemble</CardDescription>
                 </div>
                 <Button variant="ghost" size="sm" asChild>
                   <Link href="/dashboard/planning">
@@ -231,7 +231,7 @@ export default function DashboardPage() {
                 </Button>
               </div>
             </CardHeader>
-            <CardContent className="space-y-3 max-h-[400px] overflow-y-auto">
+            <CardContent className="space-y-2 lg:space-y-3 max-h-[250px] lg:max-h-[400px] overflow-y-auto p-3 lg:p-6">
               {loading ? (
                 <div className="space-y-3">
                   {[1, 2].map((i) => (
@@ -369,11 +369,11 @@ export default function DashboardPage() {
           className="lg:col-span-3"
         >
           <Card className="border border-border h-full">
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-2 lg:pb-3 p-3 lg:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-xl">Revenus</CardTitle>
-                  <CardDescription className="text-sm">Évolution sur 6 derniers mois</CardDescription>
+                  <CardTitle className="text-base lg:text-xl">Revenus</CardTitle>
+                  <CardDescription className="text-xs lg:text-sm">Évolution sur 6 derniers mois</CardDescription>
                 </div>
                 <Button variant="ghost" size="sm" asChild>
                   <Link href="/dashboard/finances">
@@ -382,8 +382,9 @@ export default function DashboardPage() {
                 </Button>
               </div>
             </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={350}>
+            <CardContent className="p-2 lg:p-6">
+              <div className="w-full h-[200px] lg:h-[350px]">
+                <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={revenueData.length > 0 ? revenueData : [
                   { month: 'Jan', revenue: 0 },
                   { month: 'Fév', revenue: 0 },
@@ -418,6 +419,7 @@ export default function DashboardPage() {
                   />
                 </AreaChart>
               </ResponsiveContainer>
+              </div>
             </CardContent>
           </Card>
         </motion.div>
@@ -430,17 +432,17 @@ export default function DashboardPage() {
         transition={{ delay: 0.5 }}
       >
         <Card className="border border-border">
-          <CardHeader className="pb-2">
+          <CardHeader className="pb-2 lg:pb-2 p-3 lg:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-lg">Activité récente</CardTitle>
-                <CardDescription className="text-xs">Dernières actions</CardDescription>
+                <CardTitle className="text-sm lg:text-lg">Activité récente</CardTitle>
+                <CardDescription className="text-[10px] lg:text-xs">Dernières actions</CardDescription>
               </div>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-3 lg:p-6">
             {loading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-2 lg:gap-3">
                 {[1, 2, 3, 4].map((i) => (
                   <div key={i} className="h-12 bg-muted animate-pulse rounded-lg"></div>
                 ))}
@@ -451,14 +453,14 @@ export default function DashboardPage() {
                 <p className="text-xs">Aucune activité</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-2 lg:gap-3">
                 {recentActivity.slice(0, 4).map((activity, index) => (
                   <motion.div
                     key={index}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.6 + index * 0.05 }}
-                    className="flex items-center gap-2 p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors"
+                    className="flex items-center gap-2 lg:gap-2 p-2.5 lg:p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors"
                   >
                     <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
                       activity.type === 'invoice' ? 'bg-primary/20 text-primary' :
