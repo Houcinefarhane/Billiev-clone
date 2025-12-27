@@ -68,7 +68,8 @@ async function main() {
 
   // Récupérer ou créer l'artisan avec les bons identifiants
   const artisanEmail = 'admin.123@outlook.fr'
-  const artisanPassword = 'Houcine78!'
+  // Mot de passe par défaut pour les comptes de test (à changer en production)
+  const artisanPassword = process.env.SEED_PASSWORD || 'password123'
   
   let artisan = await prisma.artisan.findUnique({
     where: { email: artisanEmail }
