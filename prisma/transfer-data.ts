@@ -33,6 +33,7 @@ async function main() {
   if (!targetEmail) {
     console.log('\n❌ Usage: npm run db:transfer <email-source> <email-destination>')
     console.log('   Ou définir SOURCE_EMAIL et TARGET_EMAIL dans .env')
+    console.log('   Exemple: npm run db:transfer source@example.com destination@example.com')
     return
   }
 
