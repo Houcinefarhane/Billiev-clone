@@ -7,6 +7,4 @@
 
 [build.environment]
   NODE_VERSION = "20"
-  # Exclure les fichiers compilés du scan des secrets
-  SECRETS_SCAN_OMIT_PATHS = ".next/**,.netlify/**,node_modules/**"
 

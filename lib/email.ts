@@ -3,17 +3,16 @@ import { Resend } from 'resend'
 // Initialiser Resend avec vérification de la clé API
 const resendApiKey = process.env.RESEND_API_KEY
 if (!resendApiKey) {
-  console.warn('RESEND_API_KEY n\'est pas définie dans les variables d\'environnement')
-  console.warn('Les emails de vérification ne seront pas envoyés')
+  console.warn('Service email non configuré')
 } else {
-  console.log('RESEND_API_KEY chargée')
+  // Clé API chargée (ne pas logger pour sécurité)
 }
 
 let resend: Resend | null = null
 try {
   if (resendApiKey) {
     resend = new Resend(resendApiKey)
-    console.log('Resend initialisé avec succès')
+    // Resend initialisé (ne pas logger pour sécurité)
   }
 } catch (error) {
   console.error('Erreur lors de l\'initialisation de Resend:', error)

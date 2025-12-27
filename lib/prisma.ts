@@ -56,7 +56,7 @@ const prisma: PrismaClient = globalThis.prisma ?? (() => {
     try {
       const databaseUrl = validateDatabaseUrl(process.env.DATABASE_URL)
       if (process.env.NODE_ENV === 'development') {
-        console.log('DATABASE_URL validé avec succès')
+        // DATABASE_URL validé (ne pas logger pour sécurité)
       }
       
       return new PrismaClient({
