@@ -58,14 +58,19 @@ const prisma: PrismaClient = globalThis.prisma ?? (() => {
       
       // Logger en production pour debug (sans exposer le mot de passe)
       if (process.env.NODE_ENV === 'production') {
-        const urlObj = new URL(databaseUrl)
-        console.log('DATABASE_URL configuré:', {
-          host: urlObj.hostname,
-          port: urlObj.port,
-          database: urlObj.pathname,
-          user: urlObj.username,
-          hasPassword: !!urlObj.password,
-        })
+        try {
+          const urlObj = new URL(databaseUrl)
+          console.log('DATABASE_URL configuré:', {
+            host: urlObj.hostname,
+            port: urlObj.port || '5432 (défaut)',
+            database: urlObj.pathname,
+            user: urlObj.username,
+            hasPassword: !!urlObj.password,
+            passwordLength: urlObj.password?.length || 0,
+          })
+        } catch (urlError) {
+          console.error('Erreur lors du parsing de DATABASE_URL:', urlError)
+        }
       }
       
       // Prisma lit DATABASE_URL depuis le schema.prisma (env("DATABASE_URL"))

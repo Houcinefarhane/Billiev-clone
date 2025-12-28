@@ -25,8 +25,16 @@ export async function POST(request: Request) {
 
     // Trouver l'artisan
     console.log('Recherche artisan dans la base de données...')
+    console.log('DATABASE_URL présent:', !!process.env.DATABASE_URL)
+    console.log('DATABASE_URL commence par:', process.env.DATABASE_URL?.substring(0, 20) || 'N/A')
+    
     let artisan
     try {
+      // Tester la connexion d'abord
+      console.log('Test de connexion à la base de données...')
+      await prisma.$connect()
+      console.log('Connexion réussie!')
+      
       const emailNormalized = email.toLowerCase().trim()
       console.log('Email normalisé:', emailNormalized)
       
