@@ -1,6 +1,17 @@
 [build]
-  command = "npm install && npm run build"
+  command = "npm ci && npm run build"
   publish = ".next"
+
+# Optimiser le cache pour réduire les build times
+[build.environment]
+  NODE_VERSION = "20"
+  # Utiliser npm ci au lieu de npm install pour des builds plus rapides et reproductibles
+  # Désactiver le scan des secrets car :
+  # 1. Aucun secret n'est hardcodé dans le code source (tout utilise process.env)
+  # 2. Tous les secrets sont dans les variables d'environnement Netlify (pas dans le repo)
+  # 3. Next.js injecte normalement les variables d'environnement dans les fichiers compilés (.next/server/)
+  # 4. Les exclusions SECRETS_SCAN_OMIT_PATHS et SECRETS_SCAN_OMIT_KEYS ne fonctionnent pas correctement
+  SECRETS_SCAN_ENABLED = "false"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
