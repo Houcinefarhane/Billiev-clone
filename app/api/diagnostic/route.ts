@@ -73,9 +73,27 @@ export async function GET() {
       url: config.url.substring(0, 50) + '...', // Afficher seulement le début
       success: false,
       error: null,
+      parsedUrl: null,
     }
 
     try {
+      // Parser l'URL pour vérifier le format
+      try {
+        const urlObj = new URL(config.url)
+        testResult.parsedUrl = {
+          protocol: urlObj.protocol,
+          username: urlObj.username,
+          hostname: urlObj.hostname,
+          port: urlObj.port,
+          pathname: urlObj.pathname,
+          hasPassword: !!urlObj.password,
+          passwordLength: urlObj.password?.length || 0,
+          queryParams: urlObj.search,
+        }
+      } catch (parseError: any) {
+        testResult.parseError = parseError.message
+      }
+
       // Créer un client Prisma temporaire avec cette URL
       const testPrisma = new PrismaClient({
         datasources: {
@@ -116,9 +134,10 @@ export async function GET() {
       if (error.code === 'P1001') {
         testResult.help = 'Impossible de se connecter au serveur. Cela peut signifier : 1) Le serveur Supabase est inaccessible depuis Netlify, 2) Le port est bloqué par un firewall, 3) L\'adresse IP de Netlify n\'est pas autorisée dans Supabase.'
         diagnostic.recommendations.push('Vérifiez dans Supabase : Settings → Database → Connection Pooling → Activez le pooler et autorisez toutes les IPs (0.0.0.0/0)')
-      } else if (error.code === 'P1000') {
-        testResult.help = 'Échec d\'authentification. Vérifiez le mot de passe (doit être URL-encodé).'
-        diagnostic.recommendations.push('Vérifiez que le mot de passe dans DATABASE_URL est correctement encodé (ex: ! devient %21)')
+      } else if (error.code === 'P1000' || error.message?.includes('Authentication failed') || error.message?.includes('credentials')) {
+        testResult.help = 'Échec d\'authentification. Vérifiez : 1) Le username est correct (doit être postgres.tqvdjfesnavnsqchufjg pour le pooler), 2) Le mot de passe est correct et URL-encodé, 3) Le mot de passe dans Supabase correspond.'
+        diagnostic.recommendations.push('Vérifiez dans Supabase : Settings → Database → Reset database password si nécessaire')
+        diagnostic.recommendations.push('Pour le pooler, le username doit être postgres.[PROJECT_REF], pas juste postgres')
       } else if (error.code === 'P1013') {
         testResult.help = 'Format de connexion invalide.'
         diagnostic.recommendations.push('Vérifiez le format de DATABASE_URL. Il ne doit pas contenir de guillemets.')
