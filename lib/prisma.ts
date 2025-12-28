@@ -68,13 +68,10 @@ const prisma: PrismaClient = globalThis.prisma ?? (() => {
         })
       }
       
+      // Prisma lit DATABASE_URL depuis le schema.prisma (env("DATABASE_URL"))
+      // Pas besoin de le passer explicitement dans datasources
       return new PrismaClient({
         log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
-        datasources: {
-          db: {
-            url: databaseUrl,
-          },
-        },
       })
     } catch (error: any) {
       console.error('=== ERREUR DE CONFIGURATION DATABASE_URL ===')
