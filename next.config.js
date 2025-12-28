@@ -11,8 +11,7 @@ const nextConfig = {
     }
     return config
   },
-  // Configuration pour Netlify
-  output: 'standalone',
+  // Configuration pour Vercel (pas besoin de output: 'standalone')
   // Désactiver la validation de la base de données pendant le build
   experimental: {
     serverActions: {
