@@ -9,6 +9,7 @@ import { FileText, Plus, Download, Eye, Search, Filter, X, Trash2, CheckCircle2,
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { Logo } from '@/components/Logo'
 import { generateInvoicePDF } from '@/lib/pdf-generator'
+import ClientSearchSelect from '@/components/ClientSearchSelect'
 
 interface QuoteItem {
   description: string
@@ -68,8 +69,6 @@ export default function DevisPage() {
     notes: '',
     items: [{ description: '', quantity: 1, unitPrice: 0, total: 0 }] as QuoteItem[],
   })
-  const [clientSearch, setClientSearch] = useState('')
-  const [showClientDropdown, setShowClientDropdown] = useState(false)
 
   const fetchQuotes = async (page: number = 1, search: string = '', status: string = 'all') => {
     try {
@@ -242,8 +241,6 @@ export default function DevisPage() {
       notes: '',
       items: [{ description: '', quantity: 1, unitPrice: 0, total: 0 }],
     })
-    setClientSearch('')
-    setShowClientDropdown(false)
     setShowForm(false)
   }
 
@@ -322,16 +319,6 @@ export default function DevisPage() {
 
   // Recherche côté serveur - pas besoin de filtrage côté client
   const filteredQuotes = useMemo(() => quotes, [quotes])
-
-  const filteredClients = useMemo(() => {
-    if (!clientSearch.trim()) return clients
-    const search = clientSearch.toLowerCase()
-    return clients.filter(client => 
-      `${client.firstName} ${client.lastName}`.toLowerCase().includes(search) ||
-      client.firstName.toLowerCase().includes(search) ||
-      client.lastName.toLowerCase().includes(search)
-    )
-  }, [clients, clientSearch])
 
   const selectedQuote = useMemo(() => {
     return showDetails ? quotes.find((q) => q.id === showDetails) : null
@@ -582,63 +569,12 @@ export default function DevisPage() {
                     <CardContent className="p-6">
                       <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <div className="space-y-2 relative client-search-container">
-                            <Label htmlFor="clientSearch">Client *</Label>
-                            <div className="relative">
-                              <Input
-                                id="clientSearch"
-                                type="text"
-                                value={clientSearch}
-                                onChange={(e) => {
-                                  setClientSearch(e.target.value)
-                                  setShowClientDropdown(true)
-                                  if (!e.target.value) {
-                                    setFormData({ ...formData, clientId: '' })
-                                  }
-                                }}
-                                onFocus={() => setShowClientDropdown(true)}
-                                placeholder="Rechercher un client..."
-                                required={!formData.clientId}
-                                className="h-11"
-                              />
-                              {showClientDropdown && filteredClients.length > 0 && (
-                                <div className="absolute z-50 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-60 overflow-auto">
-                                  {filteredClients.map((client) => (
-                                    <div
-                                      key={client.id}
-                                      className="px-4 py-2 hover:bg-muted cursor-pointer"
-                                      onClick={() => {
-                                        setFormData({ ...formData, clientId: client.id })
-                                        setClientSearch(`${client.firstName} ${client.lastName}`)
-                                        setShowClientDropdown(false)
-                                      }}
-                                    >
-                                      {client.firstName} {client.lastName}
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                              {formData.clientId && (
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="icon"
-                                  className="absolute right-1 top-1 h-9 w-9"
-                                  onClick={() => {
-                                    setFormData({ ...formData, clientId: '' })
-                                    setClientSearch('')
-                                  }}
-                                >
-                                  <X className="w-4 h-4" />
-                                </Button>
-                              )}
-                            </div>
-                            {formData.clientId && (
-                              <p className="text-xs text-muted-foreground">
-                                Client sélectionné: {clients.find(c => c.id === formData.clientId)?.firstName} {clients.find(c => c.id === formData.clientId)?.lastName}
-                              </p>
-                            )}
-                          </div>
+                          <ClientSearchSelect
+                            value={formData.clientId}
+                            onChange={(clientId) => setFormData({ ...formData, clientId })}
+                            label="Client"
+                            required
+                          />
                           <div className="space-y-2">
                             <Label htmlFor="date">Date *</Label>
                             <Input

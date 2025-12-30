@@ -11,6 +11,7 @@ import { formatDate, formatDateTime } from '@/lib/utils'
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, addDays, subDays, startOfDay, isToday, addWeeks, subWeeks, getHours, getMinutes, setHours, setMinutes } from 'date-fns'
 import { fr } from 'date-fns/locale/fr'
 import { toast } from '@/lib/toast'
+import ClientSearchSelect from '@/components/ClientSearchSelect'
 
 interface Intervention {
   id: string
@@ -1009,25 +1010,14 @@ export default function PlanningPage() {
                         placeholder="Ex: Réparation de fuite"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="clientId">Client *</Label>
-                      <select
-                        id="clientId"
-                        value={formData.clientId}
-                        onChange={(e) =>
-                          setFormData({ ...formData, clientId: e.target.value })
-                        }
-                        required
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                      >
-                        <option value="">Sélectionner un client</option>
-                        {clients.map((client) => (
-                          <option key={client.id} value={client.id}>
-                            {client.firstName} {client.lastName}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                    <ClientSearchSelect
+                      value={formData.clientId}
+                      onChange={(clientId) =>
+                        setFormData({ ...formData, clientId })
+                      }
+                      label="Client"
+                      required
+                    />
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="status">État *</Label>

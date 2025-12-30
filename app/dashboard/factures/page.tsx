@@ -10,6 +10,7 @@ import { FileText, Plus, Download, Eye, CheckCircle2, XCircle, Clock, Search, Fi
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { Logo } from '@/components/Logo'
 import { generateInvoicePDF } from '@/lib/pdf-generator'
+import ClientSearchSelect from '@/components/ClientSearchSelect'
 // Import dynamique pour éviter les problèmes de chargement
 // import { exportInvoices } from '@/lib/export'
 
@@ -567,23 +568,12 @@ export default function FacturesPage() {
                 <CardContent className="p-6">
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="clientId">Client *</Label>
-                        <select
-                          id="clientId"
-                          value={formData.clientId}
-                          onChange={(e) => setFormData({ ...formData, clientId: e.target.value })}
-                          required
-                          className="flex h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                        >
-                          <option value="">Sélectionner un client</option>
-                          {clients.map((client) => (
-                            <option key={client.id} value={client.id}>
-                              {client.firstName} {client.lastName}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
+                      <ClientSearchSelect
+                        value={formData.clientId}
+                        onChange={(clientId) => setFormData({ ...formData, clientId })}
+                        label="Client"
+                        required
+                      />
                       <div className="space-y-2">
                         <Label htmlFor="date">Date *</Label>
                         <Input
