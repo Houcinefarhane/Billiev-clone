@@ -134,7 +134,7 @@ export default function PlanningPage() {
               title: formData.title,
               description: formData.description,
               date: dateTime.toISOString(),
-              duration: duration && duration <= 120 ? duration : null,
+              duration: formData.duration ? parseInt(formData.duration) : null,
               clientId: formData.clientId,
               address: formData.address,
               price: formData.price ? parseFloat(formData.price) : null,
