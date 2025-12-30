@@ -169,6 +169,29 @@ export default function FinancesPage() {
     }
   }
 
+  const handleSyncAllObjectives = async () => {
+    const loadingToast = alert('⏳ Synchronisation en cours...')
+    
+    try {
+      // Synchroniser tous les objectifs un par un
+      for (const objective of objectives) {
+        await fetch('/api/financial-objectives/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ objectiveId: objective.id }),
+        })
+      }
+      
+      // Recharger les objectifs
+      await fetchObjectives()
+      
+      alert('✅ Tous les objectifs ont été synchronisés avec succès !')
+    } catch (error) {
+      console.error('Error syncing all objectives:', error)
+      alert('❌ Erreur lors de la synchronisation des objectifs')
+    }
+  }
+
   const handleCreateObjective = async (e: React.FormEvent) => {
     e.preventDefault()
     
@@ -599,6 +622,21 @@ export default function FinancesPage() {
                 subtitle={`${achievedObjectives} sur ${objectives.length} objectif${objectives.length > 1 ? 's' : ''}`}
                 size={280}
               />
+              
+              {/* Bouton de synchronisation global */}
+              <Button
+                onClick={handleSyncAllObjectives}
+                className="mt-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-8 py-6 text-lg shadow-lg"
+                size="lg"
+              >
+                <RefreshCw className="w-5 h-5 mr-2" />
+                Synchroniser tous les objectifs avec les données réelles
+              </Button>
+              
+              <p className="text-xs text-muted-foreground mt-2 text-center max-w-md">
+                Cliquez pour mettre à jour automatiquement les valeurs de vos objectifs avec vos revenus, bénéfices et dépenses actuels
+              </p>
+              
               <div className="mt-6 grid grid-cols-3 gap-4 w-full max-w-md">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-red-500">0-33%</div>
