@@ -109,12 +109,20 @@ export default function ActivityHeatMap() {
   }
 
   const getColor = (count: number, isCurrentMonth: boolean) => {
-    if (!isCurrentMonth) return 'bg-gray-50 dark:bg-gray-900 opacity-30'
-    if (count === 0) return 'bg-gray-100 dark:bg-gray-800'
-    if (count === 1) return 'bg-blue-200 dark:bg-blue-900'
-    if (count === 2) return 'bg-blue-400 dark:bg-blue-700'
-    if (count >= 3 && count <= 4) return 'bg-blue-600 dark:bg-blue-600'
-    return 'bg-blue-800 dark:bg-blue-500'
+    if (!isCurrentMonth) return 'bg-gray-200/50 dark:bg-gray-800/50'
+    if (count === 0) return 'bg-blue-50 dark:bg-slate-900'
+    if (count === 1) return 'bg-cyan-200 dark:bg-cyan-900'
+    if (count === 2) return 'bg-cyan-400 dark:bg-cyan-700'
+    if (count === 3) return 'bg-teal-400 dark:bg-teal-600'
+    if (count === 4) return 'bg-green-400 dark:bg-green-600'
+    if (count >= 5 && count <= 7) return 'bg-yellow-400 dark:bg-yellow-600'
+    return 'bg-orange-400 dark:bg-orange-600'
+  }
+
+  const getTextColor = (count: number) => {
+    if (count === 0) return 'text-gray-400'
+    if (count <= 2) return 'text-gray-800 dark:text-white'
+    return 'text-white'
   }
 
   const getIntensity = (count: number) => {
@@ -234,39 +242,40 @@ export default function ActivityHeatMap() {
                       >
                         <div
                           className={`
-                            aspect-square rounded-lg flex flex-col items-center justify-center
-                            transition-all duration-200 hover:scale-110 hover:shadow-lg cursor-pointer
-                            relative group
+                            aspect-square rounded flex flex-col items-center justify-center
+                            transition-all duration-200 hover:scale-105 hover:shadow-xl cursor-pointer
+                            relative group border border-white/20
                             ${getColor(dayData.count, dayData.isCurrentMonth)}
-                            ${isToday ? 'ring-2 ring-primary ring-offset-2' : ''}
+                            ${isToday ? 'ring-2 ring-black dark:ring-white ring-offset-1' : ''}
                           `}
                         >
-                          {/* Numéro du jour */}
+                          {/* Numéro du jour - petit en haut */}
                           <span
                             className={`
-                              text-sm font-semibold
-                              ${dayData.isCurrentMonth ? 'text-foreground' : 'text-muted-foreground'}
-                              ${dayData.count > 3 ? 'text-white' : ''}
+                              text-[10px] font-medium absolute top-0.5 left-1
+                              ${dayData.isCurrentMonth ? getTextColor(dayData.count) : 'text-gray-400'}
                             `}
                           >
                             {dayData.date}
                           </span>
                           
-                          {/* Badge nombre d'interventions */}
-                          {dayData.count > 0 && dayData.isCurrentMonth && (
-                            <span className="text-[10px] font-bold text-white bg-black/30 px-1.5 py-0.5 rounded-full mt-1">
+                          {/* Nombre d'interventions - grand au centre */}
+                          {dayData.isCurrentMonth && (
+                            <span className={`text-lg font-bold ${getTextColor(dayData.count)}`}>
                               {dayData.count}
                             </span>
                           )}
                           
                           {/* Tooltip au survol */}
                           {dayData.isCurrentMonth && (
-                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10 pointer-events-none">
-                              {dayData.date} {monthName.split(' ')[0]}
-                              <div className="font-semibold">
+                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10 pointer-events-none shadow-xl">
+                              <div className="font-semibold text-sm">
+                                {dayData.date} {monthName.split(' ')[0]}
+                              </div>
+                              <div className="text-xs mt-1">
                                 {dayData.count} intervention{dayData.count > 1 ? 's' : ''}
                               </div>
-                              <div className="text-[10px] text-gray-300">
+                              <div className="text-[10px] text-gray-300 mt-0.5">
                                 {getIntensity(dayData.count)}
                               </div>
                             </div>
@@ -281,15 +290,31 @@ export default function ActivityHeatMap() {
 
             {/* Légende */}
             <div className="flex items-center justify-between pt-4 border-t">
-              <span className="text-xs text-muted-foreground">Moins d'activité</span>
+              <span className="text-xs text-muted-foreground font-medium">Moins d'activité</span>
               <div className="flex gap-1">
-                <div className="w-4 h-4 rounded bg-gray-100 dark:bg-gray-800"></div>
-                <div className="w-4 h-4 rounded bg-blue-200 dark:bg-blue-900"></div>
-                <div className="w-4 h-4 rounded bg-blue-400 dark:bg-blue-700"></div>
-                <div className="w-4 h-4 rounded bg-blue-600 dark:bg-blue-600"></div>
-                <div className="w-4 h-4 rounded bg-blue-800 dark:bg-blue-500"></div>
+                <div className="w-6 h-6 rounded flex items-center justify-center bg-blue-50 dark:bg-slate-900 border border-gray-200 dark:border-gray-700">
+                  <span className="text-[10px] font-bold text-gray-400">0</span>
+                </div>
+                <div className="w-6 h-6 rounded flex items-center justify-center bg-cyan-200 dark:bg-cyan-900">
+                  <span className="text-[10px] font-bold text-gray-800 dark:text-white">1</span>
+                </div>
+                <div className="w-6 h-6 rounded flex items-center justify-center bg-cyan-400 dark:bg-cyan-700">
+                  <span className="text-[10px] font-bold text-gray-800 dark:text-white">2</span>
+                </div>
+                <div className="w-6 h-6 rounded flex items-center justify-center bg-teal-400 dark:bg-teal-600">
+                  <span className="text-[10px] font-bold text-white">3</span>
+                </div>
+                <div className="w-6 h-6 rounded flex items-center justify-center bg-green-400 dark:bg-green-600">
+                  <span className="text-[10px] font-bold text-white">4</span>
+                </div>
+                <div className="w-6 h-6 rounded flex items-center justify-center bg-yellow-400 dark:bg-yellow-600">
+                  <span className="text-[10px] font-bold text-white">5+</span>
+                </div>
+                <div className="w-6 h-6 rounded flex items-center justify-center bg-orange-400 dark:bg-orange-600">
+                  <span className="text-[10px] font-bold text-white">8+</span>
+                </div>
               </div>
-              <span className="text-xs text-muted-foreground">Plus d'activité</span>
+              <span className="text-xs text-muted-foreground font-medium">Plus d'activité</span>
             </div>
           </div>
         )}
