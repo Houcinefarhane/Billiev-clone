@@ -69,13 +69,19 @@ export default function ActivityHeatMap() {
         const calendarData: DayData[] = []
         
         // Calculer le jour de la semaine du premier jour (0 = Dimanche, 1 = Lundi, etc.)
-        const firstDayOfWeek = (firstDay.getDay() + 6) % 7 // Convertir en 0 = Lundi
+        // En JavaScript: 0=Dim, 1=Lun, 2=Mar, 3=Mer, 4=Jeu, 5=Ven, 6=Sam
+        // On veut: 0=Lun, 1=Mar, 2=Mer, 3=Jeu, 4=Ven, 5=Sam, 6=Dim
+        let firstDayOfWeek = firstDay.getDay() - 1 // -1 pour que Lundi = 0
+        if (firstDayOfWeek === -1) firstDayOfWeek = 6 // Dimanche devient 6
         
-        // Ajouter les jours vides avant le début du mois
-        for (let i = 0; i < firstDayOfWeek; i++) {
-          const prevMonthDay = new Date(year, month, -firstDayOfWeek + i + 1)
+        // Ajouter les jours du mois précédent pour compléter la première semaine
+        const prevMonth = new Date(year, month, 0) // Dernier jour du mois précédent
+        const prevMonthLastDay = prevMonth.getDate()
+        
+        for (let i = firstDayOfWeek - 1; i >= 0; i--) {
+          const dayNumber = prevMonthLastDay - i
           calendarData.push({
-            date: prevMonthDay.getDate(),
+            date: dayNumber,
             count: 0,
             isCurrentMonth: false,
           })
@@ -91,7 +97,7 @@ export default function ActivityHeatMap() {
           })
         }
         
-        // Ajouter les jours vides après la fin du mois pour compléter la dernière semaine
+        // Ajouter les jours du mois suivant pour compléter la dernière semaine
         const remainingDays = 7 - (calendarData.length % 7)
         if (remainingDays < 7) {
           for (let i = 1; i <= remainingDays; i++) {
