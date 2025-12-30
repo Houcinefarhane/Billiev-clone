@@ -113,18 +113,6 @@ export default function DevisPage() {
     fetchClients()
   }, [currentPage, searchTerm, statusFilter])
 
-  // Fermer le dropdown client quand on clique ailleurs
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement
-      if (!target.closest('.client-search-container')) {
-        setShowClientDropdown(false)
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
-
   const calculateTotals = (items: QuoteItem[], taxRate: number) => {
     const subtotal = items.reduce((sum, item) => {
       const itemTotal = Number(item.total) || 0
