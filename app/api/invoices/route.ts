@@ -15,20 +15,43 @@ export async function GET(request: Request) {
       )
     }
 
-    // Récupérer les paramètres de pagination
+    // Récupérer les paramètres de pagination et recherche
     const { searchParams } = new URL(request.url)
     const page = parseInt(searchParams.get('page') || '1', 10)
     const limit = parseInt(searchParams.get('limit') || '10', 10)
+    const search = searchParams.get('search') || ''
+    const status = searchParams.get('status') || ''
     const skip = (page - 1) * limit
+
+    // Construire le filtre de recherche
+    const whereClause: any = { artisanId: artisan.id }
+    
+    if (search) {
+      whereClause.OR = [
+        { invoiceNumber: { contains: search, mode: 'insensitive' } },
+        { 
+          client: {
+            OR: [
+              { firstName: { contains: search, mode: 'insensitive' } },
+              { lastName: { contains: search, mode: 'insensitive' } },
+            ]
+          }
+        },
+      ]
+    }
+    
+    if (status && status !== 'all') {
+      whereClause.status = status
+    }
 
     // Compter le total de factures
     const total = await prisma.invoice.count({
-      where: { artisanId: artisan.id },
+      where: whereClause,
     })
 
     // Récupérer les factures avec pagination
     const invoices = await prisma.invoice.findMany({
-      where: { artisanId: artisan.id },
+      where: whereClause,
       include: {
         client: {
           select: {

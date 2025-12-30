@@ -73,13 +73,15 @@ export default function DepensesPage() {
   })
 
   useEffect(() => {
-    fetchExpenses(currentPage)
-  }, [currentPage])
+    fetchExpenses(currentPage, searchTerm, categoryFilter)
+  }, [currentPage, searchTerm, categoryFilter])
 
-  const fetchExpenses = async (page: number = 1) => {
+  const fetchExpenses = async (page: number = 1, search: string = '', category: string = 'all') => {
     try {
       setLoading(true)
-      const res = await fetch(`/api/expenses?page=${page}&limit=10`)
+      const searchParam = search ? `&search=${encodeURIComponent(search)}` : ''
+      const categoryParam = category !== 'all' ? `&category=${encodeURIComponent(category)}` : ''
+      const res = await fetch(`/api/expenses?page=${page}&limit=10${searchParam}${categoryParam}`)
       const data = await res.json()
       if (res.ok) {
         setExpenses(data.expenses || [])
@@ -186,15 +188,9 @@ export default function DepensesPage() {
     }
   }
 
-  // Filtrer les dépenses côté client (pour la recherche et les filtres)
-  const filteredExpenses = expenses.filter((expense) => {
-    const matchesSearch =
-      expense.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      expense.category.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesCategory = categoryFilter === 'all' || expense.category === categoryFilter
-    return matchesSearch && matchesCategory
-  })
-
+  // Recherche côté serveur - pas besoin de filtrage côté client
+  const filteredExpenses = expenses
+  
   const totalExpenses = filteredExpenses.reduce((sum, exp) => sum + exp.amount, 0)
 
   // Dépenses récentes (10 dernières) - depuis toutes les dépenses chargées
@@ -256,7 +252,10 @@ export default function DepensesPage() {
           <Input
             placeholder="Rechercher une dépense..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value)
+              setCurrentPage(1) // Réinitialiser à la page 1 lors d'une recherche
+            }}
             className="pl-10 h-11"
           />
         </div>
@@ -264,7 +263,10 @@ export default function DepensesPage() {
           <Filter className="w-5 h-5 text-muted-foreground" />
           <select
             value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
+            onChange={(e) => {
+              setCategoryFilter(e.target.value)
+              setCurrentPage(1) // Réinitialiser à la page 1 lors d'un changement de filtre
+            }}
             className="flex h-11 w-full sm:w-48 rounded-md border border-input bg-background px-3 py-2 text-sm"
           >
             <option value="all">Toutes les catégories</option>

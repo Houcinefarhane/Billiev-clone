@@ -75,16 +75,18 @@ export default function FacturesPage() {
   })
 
   useEffect(() => {
-    fetchInvoices(currentPage)
+    fetchInvoices(currentPage, searchTerm, statusFilter)
     fetchClients()
-  }, [currentPage])
+  }, [currentPage, searchTerm, statusFilter])
 
   // Fonctions utilitaires
 
-  const fetchInvoices = async (page: number = 1) => {
+  const fetchInvoices = async (page: number = 1, search: string = '', status: string = 'all') => {
     try {
       setLoading(true)
-      const res = await fetch(`/api/invoices?page=${page}&limit=10`)
+      const searchParam = search ? `&search=${encodeURIComponent(search)}` : ''
+      const statusParam = status !== 'all' ? `&status=${status}` : ''
+      const res = await fetch(`/api/invoices?page=${page}&limit=10${searchParam}${statusParam}`)
       const data = await res.json()
       if (res.ok) {
         console.log('Factures reçues:', data.invoices?.length || 0, 'sur', data.pagination?.total || 0)
@@ -286,19 +288,8 @@ export default function FacturesPage() {
     }
   }
 
-  // Filtrer les factures selon la recherche et le statut
-  const filteredInvoices = invoices.filter((invoice) => {
-    const searchLower = searchTerm.toLowerCase()
-    const invoiceNumberMatch = invoice.invoiceNumber.toLowerCase().includes(searchLower)
-    const clientName = invoice.client.firstName + ' ' + invoice.client.lastName
-    const clientNameMatch = clientName.toLowerCase().includes(searchLower)
-    const matchesSearch = invoiceNumberMatch || clientNameMatch
-    const matchesStatus = statusFilter === 'all' || invoice.status === statusFilter
-    return matchesSearch && matchesStatus
-  })
-
-  // Debug: afficher le nombre de factures filtrées
-  console.log('Factures totales:', invoices.length, 'Filtrées:', filteredInvoices.length, 'Recherche:', searchTerm, 'Statut:', statusFilter)
+  // Recherche côté serveur - pas besoin de filtrage côté client
+  const filteredInvoices = invoices
 
   // Trouver la facture sélectionnée
   const selectedInvoice = showDetails ? invoices.find((inv) => inv.id === showDetails) : null
@@ -359,7 +350,10 @@ export default function FacturesPage() {
           <Input
             placeholder="Rechercher une facture..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value)
+              setCurrentPage(1) // Réinitialiser à la page 1 lors d'une recherche
+            }}
             className="pl-10"
           />
         </div>
@@ -369,7 +363,10 @@ export default function FacturesPage() {
               key={status}
               variant={statusFilter === status ? 'default' : 'outline'}
               size="sm"
-              onClick={() => setStatusFilter(status)}
+              onClick={() => {
+                setStatusFilter(status)
+                setCurrentPage(1) // Réinitialiser à la page 1 lors d'un changement de filtre
+              }}
               className="capitalize"
             >
               {status === 'all' ? 'Toutes' : status === 'draft' ? 'Brouillons' : status === 'sent' ? 'Envoyées' : status === 'paid' ? 'Payées' : 'En retard'}

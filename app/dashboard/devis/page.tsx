@@ -71,10 +71,12 @@ export default function DevisPage() {
   const [clientSearch, setClientSearch] = useState('')
   const [showClientDropdown, setShowClientDropdown] = useState(false)
 
-  const fetchQuotes = async (page: number = 1) => {
+  const fetchQuotes = async (page: number = 1, search: string = '', status: string = 'all') => {
     try {
       setLoading(true)
-      const res = await fetch(`/api/quotes?page=${page}&limit=10`)
+      const searchParam = search ? `&search=${encodeURIComponent(search)}` : ''
+      const statusParam = status !== 'all' ? `&status=${status}` : ''
+      const res = await fetch(`/api/quotes?page=${page}&limit=10${searchParam}${statusParam}`)
       const data = await res.json()
       if (res.ok) {
         console.log('Devis reçus:', data.quotes?.length || 0, 'sur', data.pagination?.total || 0)
@@ -108,9 +110,9 @@ export default function DevisPage() {
   }
 
   useEffect(() => {
-    fetchQuotes(currentPage)
+    fetchQuotes(currentPage, searchTerm, statusFilter)
     fetchClients()
-  }, [currentPage])
+  }, [currentPage, searchTerm, statusFilter])
 
   // Fermer le dropdown client quand on clique ailleurs
   useEffect(() => {
@@ -318,17 +320,8 @@ export default function DevisPage() {
     }
   }, [])
 
-  const filteredQuotes = useMemo(() => {
-    const filtered = quotes.filter((quote) => {
-      const matchesSearch =
-        quote.quoteNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        `${quote.client.firstName} ${quote.client.lastName}`.toLowerCase().includes(searchTerm.toLowerCase())
-      const matchesStatus = statusFilter === 'all' || quote.status === statusFilter
-      return matchesSearch && matchesStatus
-    })
-    console.log('Devis totaux:', quotes.length, 'Filtrés:', filtered.length, 'Recherche:', searchTerm, 'Statut:', statusFilter)
-    return filtered
-  }, [quotes, searchTerm, statusFilter])
+  // Recherche côté serveur - pas besoin de filtrage côté client
+  const filteredQuotes = useMemo(() => quotes, [quotes])
 
   const filteredClients = useMemo(() => {
     if (!clientSearch.trim()) return clients
@@ -402,7 +395,10 @@ export default function DevisPage() {
               <Input
                 placeholder="Rechercher un devis..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value)
+                  setCurrentPage(1) // Réinitialiser à la page 1 lors d'une recherche
+                }}
                 className="pl-10 h-11"
               />
             </div>
@@ -410,7 +406,10 @@ export default function DevisPage() {
               <Filter className="w-5 h-5 text-muted-foreground" />
               <select
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
+                onChange={(e) => {
+                  setStatusFilter(e.target.value)
+                  setCurrentPage(1) // Réinitialiser à la page 1 lors d'un changement de filtre
+                }}
                 className="flex h-11 w-full sm:w-48 rounded-md border border-input bg-background px-3 py-2 text-sm"
               >
                 <option value="all">Tous les statuts</option>

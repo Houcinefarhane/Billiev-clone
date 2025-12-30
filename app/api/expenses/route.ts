@@ -15,20 +15,36 @@ export async function GET(request: Request) {
       )
     }
 
-    // Récupérer les paramètres de pagination
+    // Récupérer les paramètres de pagination et recherche
     const { searchParams } = new URL(request.url)
     const page = parseInt(searchParams.get('page') || '1', 10)
     const limit = parseInt(searchParams.get('limit') || '10', 10)
+    const search = searchParams.get('search') || ''
+    const category = searchParams.get('category') || ''
     const skip = (page - 1) * limit
+
+    // Construire le filtre de recherche
+    const whereClause: any = { artisanId: artisan.id }
+    
+    if (search) {
+      whereClause.OR = [
+        { description: { contains: search, mode: 'insensitive' } },
+        { category: { contains: search, mode: 'insensitive' } },
+      ]
+    }
+    
+    if (category && category !== 'all') {
+      whereClause.category = category
+    }
 
     // Compter le total de dépenses
     const total = await prisma.expense.count({
-      where: { artisanId: artisan.id },
+      where: whereClause,
     })
 
     // Récupérer les dépenses avec pagination
     const expenses = await prisma.expense.findMany({
-      where: { artisanId: artisan.id },
+      where: whereClause,
       orderBy: { date: 'desc' },
       skip,
       take: limit,

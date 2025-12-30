@@ -15,20 +15,33 @@ export async function GET(request: Request) {
       )
     }
 
-    // Récupérer les paramètres de pagination
+    // Récupérer les paramètres de pagination et recherche
     const { searchParams } = new URL(request.url)
     const page = parseInt(searchParams.get('page') || '1', 10)
     const limit = parseInt(searchParams.get('limit') || '10', 10)
+    const search = searchParams.get('search') || ''
     const skip = (page - 1) * limit
+
+    // Construire le filtre de recherche
+    const whereClause: any = { artisanId: artisan.id }
+    
+    if (search) {
+      whereClause.OR = [
+        { firstName: { contains: search, mode: 'insensitive' } },
+        { lastName: { contains: search, mode: 'insensitive' } },
+        { phone: { contains: search } },
+        { email: { contains: search, mode: 'insensitive' } },
+      ]
+    }
 
     // Compter le total de clients
     const total = await prisma.client.count({
-      where: { artisanId: artisan.id },
+      where: whereClause,
     })
 
     // Récupérer les clients avec pagination
     const clients = await prisma.client.findMany({
-      where: { artisanId: artisan.id },
+      where: whereClause,
       orderBy: { createdAt: 'desc' },
       skip,
       take: limit,

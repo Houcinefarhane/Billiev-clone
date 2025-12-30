@@ -47,13 +47,14 @@ export default function ClientsPage() {
   })
 
   useEffect(() => {
-    fetchClients(currentPage)
-  }, [currentPage])
+    fetchClients(currentPage, searchTerm)
+  }, [currentPage, searchTerm])
 
-  const fetchClients = async (page: number = 1) => {
+  const fetchClients = async (page: number = 1, search: string = '') => {
     try {
       setLoading(true)
-      const res = await fetch(`/api/clients?page=${page}&limit=10`)
+      const searchParam = search ? `&search=${encodeURIComponent(search)}` : ''
+      const res = await fetch(`/api/clients?page=${page}&limit=10${searchParam}`)
       const data = await res.json()
       if (res.ok) {
         setClients(data.clients || [])
@@ -135,19 +136,8 @@ export default function ClientsPage() {
     setShowForm(false)
   }
 
-  // Optimisation : utiliser useMemo pour éviter de recalculer à chaque rendu
-  const filteredClients = useMemo(() => {
-    if (!searchTerm) return clients
-    
-    const lowerSearchTerm = searchTerm.toLowerCase()
-    return clients.filter(
-      (client) =>
-        client.firstName.toLowerCase().includes(lowerSearchTerm) ||
-        client.lastName.toLowerCase().includes(lowerSearchTerm) ||
-        client.phone.includes(searchTerm) ||
-        (client.email && client.email.toLowerCase().includes(lowerSearchTerm))
-    )
-  }, [clients, searchTerm])
+  // Recherche côté serveur - pas besoin de filtrage côté client
+  const filteredClients = clients
 
   return (
     <div className="space-y-8">
@@ -197,7 +187,10 @@ export default function ClientsPage() {
           <Input
             placeholder="Rechercher un client..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value)
+              setCurrentPage(1) // Réinitialiser à la page 1 lors d'une recherche
+            }}
             className="pl-10"
           />
         </div>
