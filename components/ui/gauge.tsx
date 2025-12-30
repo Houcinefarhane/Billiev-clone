@@ -53,6 +53,24 @@ export function Gauge({ value, title, subtitle, size = 250 }: GaugeProps) {
   
   return (
     <div className="flex flex-col items-center">
+      {/* Badge titre au-dessus */}
+      {title && (
+        <motion.div
+          className="flex items-center justify-center gap-2 mb-4"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          <span
+            className={`px-4 py-2 rounded-full text-sm font-bold text-white shadow-lg ${
+              title === 'Revenus' ? 'bg-green-600' : title === 'Bénéfice' ? 'bg-blue-600' : 'bg-gray-600'
+            }`}
+          >
+            {title}
+          </span>
+        </motion.div>
+      )}
+      
       <svg width={size} height={size * 0.75} viewBox={`0 0 ${size} ${size * 0.75}`}>
         {/* Segments colorés */}
         {segments.map((segment, index) => (
@@ -141,7 +159,7 @@ export function Gauge({ value, title, subtitle, size = 250 }: GaugeProps) {
         />
       </svg>
       
-      {/* Valeur et texte */}
+      {/* Valeur et sous-titre */}
       <motion.div
         className="text-center -mt-4"
         initial={{ opacity: 0, y: 10 }}
@@ -151,17 +169,6 @@ export function Gauge({ value, title, subtitle, size = 250 }: GaugeProps) {
         <div className="text-5xl font-bold text-gray-800">
           {Math.round(clampedValue)}%
         </div>
-        {title && (
-          <div className="flex items-center justify-center gap-2 mt-3">
-            <span
-              className={`px-3 py-1 rounded-full text-xs font-bold text-white ${
-                title === 'Revenus' ? 'bg-green-600' : title === 'Bénéfice' ? 'bg-blue-600' : 'bg-gray-600'
-              }`}
-            >
-              {title}
-            </span>
-          </div>
-        )}
         {subtitle && (
           <div className="text-xs text-muted-foreground mt-2 font-medium">
             {subtitle}
