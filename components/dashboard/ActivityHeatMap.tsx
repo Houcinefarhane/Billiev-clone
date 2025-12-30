@@ -39,27 +39,31 @@ export default function ActivityHeatMap() {
       const month = currentDate.getMonth()
       const firstDay = new Date(year, month, 1)
       const lastDay = new Date(year, month + 1, 0)
+      lastDay.setHours(23, 59, 59, 999) // Fin de la journée
       
-      // Récupérer toutes les interventions
-      const res = await fetch('/api/interventions?limit=1000')
+      // Récupérer les interventions du mois avec filtrage par dates
+      const params = new URLSearchParams({
+        start: firstDay.toISOString(),
+        end: lastDay.toISOString(),
+      })
+      
+      const res = await fetch(`/api/interventions?${params.toString()}`)
       const data = await res.json()
       
       if (res.ok) {
-        const interventions: Intervention[] = data.interventions || []
+        const interventions: Intervention[] = Array.isArray(data) ? data : []
         
-        // Filtrer les interventions du mois en cours
-        const monthInterventions = interventions.filter((intervention) => {
-          const date = new Date(intervention.date)
-          return date >= firstDay && date <= lastDay
-        })
+        console.log(`📅 Interventions récupérées pour ${monthName}:`, interventions.length)
         
-        // Compter les interventions par jour
+        // Compter les interventions par jour du mois
         const dayCountMap: { [key: number]: number } = {}
-        monthInterventions.forEach((intervention) => {
+        interventions.forEach((intervention) => {
           const date = new Date(intervention.date)
           const day = date.getDate()
           dayCountMap[day] = (dayCountMap[day] || 0) + 1
         })
+        
+        console.log('📊 Répartition par jour:', dayCountMap)
         
         // Créer le tableau de données pour le calendrier
         const calendarData: DayData[] = []
@@ -100,9 +104,11 @@ export default function ActivityHeatMap() {
         }
         
         setMonthData(calendarData)
+      } else {
+        console.error('❌ Erreur API:', res.status, data)
       }
     } catch (error) {
-      console.error('Error fetching month data:', error)
+      console.error('❌ Erreur lors de la récupération des données du heatmap:', error)
     } finally {
       setLoading(false)
     }
