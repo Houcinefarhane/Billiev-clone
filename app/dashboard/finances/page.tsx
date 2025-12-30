@@ -169,29 +169,6 @@ export default function FinancesPage() {
     }
   }
 
-  const handleSyncAllObjectives = async () => {
-    const loadingToast = alert('⏳ Synchronisation en cours...')
-    
-    try {
-      // Synchroniser tous les objectifs un par un
-      for (const objective of objectives) {
-        await fetch('/api/financial-objectives/sync', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ objectiveId: objective.id }),
-        })
-      }
-      
-      // Recharger les objectifs
-      await fetchObjectives()
-      
-      alert('✅ Tous les objectifs ont été synchronisés avec succès !')
-    } catch (error) {
-      console.error('Error syncing all objectives:', error)
-      alert('❌ Erreur lors de la synchronisation des objectifs')
-    }
-  }
-
   const handleCreateObjective = async (e: React.FormEvent) => {
     e.preventDefault()
     
@@ -411,36 +388,43 @@ export default function FinancesPage() {
     }
   }
 
-  // Calculer la progression globale des objectifs
-  const calculateOverallProgress = () => {
-    console.log('Calcul progression - Nombre objectifs:', objectives.length)
-    if (objectives.length === 0) return 0
+  // Calculer la progression de l'objectif principal
+  const [selectedMetric, setSelectedMetric] = useState<'revenue' | 'profit'>('revenue')
+  
+  const calculateMainProgress = () => {
+    // Utiliser les valeurs actuelles de revenus ou bénéfices
+    const currentValue = selectedMetric === 'revenue' ? stats.totalRevenue : stats.profit
     
-    let totalProgress = 0
-    let totalKeyResults = 0
+    // Trouver l'objectif correspondant à la métrique sélectionnée
+    let targetValue = 0
     
-    objectives.forEach(objective => {
-      console.log('Objectif:', objective.title, '- Key Results:', objective.keyResults.length)
-      objective.keyResults.forEach(kr => {
-        totalKeyResults++
-        const progress = kr.targetValue > 0 ? Math.min((kr.currentValue / kr.targetValue) * 100, 100) : 0
-        console.log(`  - ${kr.title}: ${kr.currentValue}/${kr.targetValue} = ${progress}%`)
-        totalProgress += progress
-      })
-    })
+    for (const objective of objectives) {
+      for (const kr of objective.keyResults) {
+        if ((selectedMetric === 'revenue' && kr.metric === 'revenue') ||
+            (selectedMetric === 'profit' && kr.metric === 'profit')) {
+          targetValue = Math.max(targetValue, kr.targetValue)
+        }
+      }
+    }
     
-    const result = totalKeyResults > 0 ? Math.round(totalProgress / totalKeyResults) : 0
-    console.log('Progression globale:', result, '%')
-    return result
+    // Si pas d'objectif défini, utiliser une valeur par défaut pour l'affichage
+    if (targetValue === 0) {
+      return 0
+    }
+    
+    // Calculer le pourcentage : (valeur actuelle / objectif) * 100
+    const progress = Math.min(Math.round((currentValue / targetValue) * 100), 100)
+    
+    console.log(`Progression ${selectedMetric}:`, currentValue, '/', targetValue, '=', progress, '%')
+    
+    return progress
   }
 
-  const overallProgress = calculateOverallProgress()
-  const achievedObjectives = objectives.reduce((count, obj) => {
-    const allAchieved = obj.keyResults.every(kr => kr.currentValue >= kr.targetValue)
-    return allAchieved ? count + 1 : count
-  }, 0)
-  
-  console.log('Affichage indicateur - Objectifs:', objectives.length, 'Progression:', overallProgress)
+  const mainProgress = calculateMainProgress()
+  const targetObjective = objectives.find(obj => 
+    obj.keyResults.some(kr => kr.metric === selectedMetric)
+  )
+  const targetValue = targetObjective?.keyResults.find(kr => kr.metric === selectedMetric)?.targetValue || 0
 
   const statCards = [
     {
@@ -598,8 +582,8 @@ export default function FinancesPage() {
         })}
       </div>
 
-      {/* Indicateur de progression des objectifs */}
-      {objectives.length > 0 && (
+      {/* Indicateur de progression de l'objectif principal */}
+      {objectives.length > 0 && targetValue > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -609,33 +593,41 @@ export default function FinancesPage() {
             <CardHeader className="text-center pb-2">
               <CardTitle className="flex items-center justify-center gap-2">
                 <Target className="w-5 h-5 text-primary" />
-                Progression de vos objectifs
+                Progression de votre objectif
               </CardTitle>
               <CardDescription>
-                État d'avancement global de tous vos objectifs financiers
+                Suivi en temps réel de votre objectif financier principal
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col items-center py-6">
+              {/* Sélecteur de métrique */}
+              <div className="flex gap-2 mb-6">
+                <Button
+                  variant={selectedMetric === 'revenue' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSelectedMetric('revenue')}
+                  className={selectedMetric === 'revenue' ? 'bg-green-600 hover:bg-green-700' : ''}
+                >
+                  <TrendingUp className="w-4 h-4 mr-2" />
+                  Revenus
+                </Button>
+                <Button
+                  variant={selectedMetric === 'profit' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSelectedMetric('profit')}
+                  className={selectedMetric === 'profit' ? 'bg-blue-600 hover:bg-blue-700' : ''}
+                >
+                  <DollarSign className="w-4 h-4 mr-2" />
+                  Bénéfice
+                </Button>
+              </div>
+
               <Gauge 
-                value={overallProgress}
-                title="Objectifs atteints"
-                subtitle={`${achievedObjectives} sur ${objectives.length} objectif${objectives.length > 1 ? 's' : ''}`}
+                value={mainProgress}
+                title={selectedMetric === 'revenue' ? 'Revenus actuels' : 'Bénéfice actuel'}
+                subtitle={`${formatCurrency(selectedMetric === 'revenue' ? stats.totalRevenue : stats.profit)} / ${formatCurrency(targetValue)}`}
                 size={280}
               />
-              
-              {/* Bouton de synchronisation global */}
-              <Button
-                onClick={handleSyncAllObjectives}
-                className="mt-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-8 py-6 text-lg shadow-lg"
-                size="lg"
-              >
-                <RefreshCw className="w-5 h-5 mr-2" />
-                Synchroniser tous les objectifs avec les données réelles
-              </Button>
-              
-              <p className="text-xs text-muted-foreground mt-2 text-center max-w-md">
-                Cliquez pour mettre à jour automatiquement les valeurs de vos objectifs avec vos revenus, bénéfices et dépenses actuels
-              </p>
               
               <div className="mt-6 grid grid-cols-3 gap-4 w-full max-w-md">
                 <div className="text-center">
