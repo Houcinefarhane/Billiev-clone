@@ -115,20 +115,22 @@ export default function ActivityHeatMap() {
   }
 
   const getColor = (count: number, isCurrentMonth: boolean) => {
-    if (!isCurrentMonth) return 'bg-gray-200/50 dark:bg-gray-800/50'
-    if (count === 0) return 'bg-blue-50 dark:bg-slate-900'
-    if (count === 1) return 'bg-cyan-200 dark:bg-cyan-900'
-    if (count === 2) return 'bg-cyan-400 dark:bg-cyan-700'
-    if (count === 3) return 'bg-teal-400 dark:bg-teal-600'
-    if (count === 4) return 'bg-green-400 dark:bg-green-600'
-    if (count >= 5 && count <= 7) return 'bg-yellow-400 dark:bg-yellow-600'
-    return 'bg-orange-400 dark:bg-orange-600'
+    if (!isCurrentMonth) return 'bg-gray-100/50 dark:bg-gray-900/50'
+    if (count === 0) return 'bg-gray-50 dark:bg-gray-900 border-gray-100 dark:border-gray-800'
+    if (count === 1) return 'bg-emerald-100 dark:bg-emerald-950 border-emerald-200 dark:border-emerald-900'
+    if (count === 2) return 'bg-emerald-200 dark:bg-emerald-900 border-emerald-300 dark:border-emerald-800'
+    if (count === 3) return 'bg-emerald-300 dark:bg-emerald-800 border-emerald-400 dark:border-emerald-700'
+    if (count === 4) return 'bg-emerald-400 dark:bg-emerald-700 border-emerald-500 dark:border-emerald-600'
+    if (count === 5) return 'bg-emerald-500 dark:bg-emerald-600 border-emerald-600 dark:border-emerald-500'
+    if (count === 6) return 'bg-emerald-600 dark:bg-emerald-500 border-emerald-700 dark:border-emerald-400'
+    if (count >= 7) return 'bg-emerald-700 dark:bg-emerald-400 border-emerald-800 dark:border-emerald-300'
+    return 'bg-emerald-800 dark:bg-emerald-300 border-emerald-900 dark:border-emerald-200'
   }
 
   const getTextColor = (count: number) => {
-    if (count === 0) return 'text-gray-400'
-    if (count <= 2) return 'text-gray-800 dark:text-white'
-    return 'text-white'
+    if (count === 0) return 'text-gray-400 dark:text-gray-600'
+    if (count <= 3) return 'text-emerald-800 dark:text-emerald-300'
+    return 'text-white dark:text-emerald-950'
   }
 
   const getIntensity = (count: number) => {
@@ -158,27 +160,27 @@ export default function ActivityHeatMap() {
 
   return (
     <Card className="border-2">
-      <CardHeader>
+      <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-primary" />
+            <Calendar className="w-4 h-4 text-primary" />
             <div>
-              <CardTitle>Carte d'activité mensuelle</CardTitle>
-              <CardDescription className="text-xs mt-1">
-                Densité des interventions - {monthName}
+              <CardTitle className="text-base">Carte d'activité mensuelle</CardTitle>
+              <CardDescription className="text-[10px] mt-0.5">
+                {monthName}
               </CardDescription>
             </div>
           </div>
           
           {/* Navigation mois */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             <Button
               variant="outline"
               size="sm"
               onClick={handlePreviousMonth}
-              className="h-8 w-8 p-0"
+              className="h-7 w-7 p-0"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-3 h-3" />
             </Button>
             
             {!isCurrentMonth && (
@@ -186,7 +188,7 @@ export default function ActivityHeatMap() {
                 variant="outline"
                 size="sm"
                 onClick={handleToday}
-                className="h-8 px-3 text-xs"
+                className="h-7 px-2 text-[10px]"
               >
                 Aujourd'hui
               </Button>
@@ -196,29 +198,29 @@ export default function ActivityHeatMap() {
               variant="outline"
               size="sm"
               onClick={handleNextMonth}
-              className="h-8 w-8 p-0"
+              className="h-7 w-7 p-0"
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-3 h-3" />
             </Button>
           </div>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-0 pb-4">
         {loading ? (
-          <div className="flex items-center justify-center h-48">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <div className="flex items-center justify-center h-32">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-2">
             {/* Calendrier mensuel */}
             <div className="overflow-x-auto">
               <div className="min-w-full">
                 {/* En-tête des jours de la semaine */}
-                <div className="grid grid-cols-7 gap-1 mb-2">
+                <div className="grid grid-cols-7 gap-0.5 mb-1">
                   {daysOfWeek.map((day) => (
                     <div
                       key={day}
-                      className="text-center text-xs font-semibold text-muted-foreground py-2"
+                      className="text-center text-[10px] font-bold text-muted-foreground py-1"
                     >
                       {day}
                     </div>
@@ -226,7 +228,7 @@ export default function ActivityHeatMap() {
                 </div>
 
                 {/* Grille des jours du mois */}
-                <div className="grid grid-cols-7 gap-1">
+                <div className="grid grid-cols-7 gap-0.5">
                   {monthData.map((dayData, index) => {
                     const today = new Date()
                     const isToday =
@@ -248,41 +250,35 @@ export default function ActivityHeatMap() {
                       >
                         <div
                           className={`
-                            aspect-square rounded flex flex-col items-center justify-center
-                            transition-all duration-200 hover:scale-105 hover:shadow-xl cursor-pointer
-                            relative group border border-white/20
+                            aspect-square rounded-sm flex flex-col items-center justify-center
+                            transition-all duration-200 hover:scale-110 hover:shadow-md cursor-pointer
+                            relative group border
                             ${getColor(dayData.count, dayData.isCurrentMonth)}
-                            ${isToday ? 'ring-2 ring-black dark:ring-white ring-offset-1' : ''}
+                            ${isToday ? 'ring-2 ring-blue-500 ring-offset-0' : ''}
                           `}
                         >
-                          {/* Numéro du jour - petit en haut */}
+                          {/* Numéro du jour - petit en haut à gauche */}
                           <span
                             className={`
-                              text-[10px] font-medium absolute top-0.5 left-1
-                              ${dayData.isCurrentMonth ? getTextColor(dayData.count) : 'text-gray-400'}
+                              text-[8px] font-semibold absolute top-0.5 left-0.5
+                              ${dayData.isCurrentMonth ? getTextColor(dayData.count) : 'text-gray-400 dark:text-gray-700'}
                             `}
                           >
                             {dayData.date}
                           </span>
                           
-                          {/* Nombre d'interventions - grand au centre */}
-                          {dayData.isCurrentMonth && (
-                            <span className={`text-lg font-bold ${getTextColor(dayData.count)}`}>
+                          {/* Nombre d'interventions - au centre */}
+                          {dayData.isCurrentMonth && dayData.count > 0 && (
+                            <span className={`text-sm font-bold ${getTextColor(dayData.count)}`}>
                               {dayData.count}
                             </span>
                           )}
                           
-                          {/* Tooltip au survol */}
+                          {/* Tooltip au survol - compact */}
                           {dayData.isCurrentMonth && (
-                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10 pointer-events-none shadow-xl">
-                              <div className="font-semibold text-sm">
-                                {dayData.date} {monthName.split(' ')[0]}
-                              </div>
-                              <div className="text-xs mt-1">
-                                {dayData.count} intervention{dayData.count > 1 ? 's' : ''}
-                              </div>
-                              <div className="text-[10px] text-gray-300 mt-0.5">
-                                {getIntensity(dayData.count)}
+                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 px-2 py-1 bg-gray-900 dark:bg-gray-800 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap z-20 pointer-events-none shadow-lg">
+                              <div className="font-semibold">
+                                {dayData.date} {monthName.split(' ')[0]} : {dayData.count} intervention{dayData.count > 1 ? 's' : ''}
                               </div>
                             </div>
                           )}
@@ -294,33 +290,20 @@ export default function ActivityHeatMap() {
               </div>
             </div>
 
-            {/* Légende */}
-            <div className="flex items-center justify-between pt-4 border-t">
-              <span className="text-xs text-muted-foreground font-medium">Moins d'activité</span>
-              <div className="flex gap-1">
-                <div className="w-6 h-6 rounded flex items-center justify-center bg-blue-50 dark:bg-slate-900 border border-gray-200 dark:border-gray-700">
-                  <span className="text-[10px] font-bold text-gray-400">0</span>
-                </div>
-                <div className="w-6 h-6 rounded flex items-center justify-center bg-cyan-200 dark:bg-cyan-900">
-                  <span className="text-[10px] font-bold text-gray-800 dark:text-white">1</span>
-                </div>
-                <div className="w-6 h-6 rounded flex items-center justify-center bg-cyan-400 dark:bg-cyan-700">
-                  <span className="text-[10px] font-bold text-gray-800 dark:text-white">2</span>
-                </div>
-                <div className="w-6 h-6 rounded flex items-center justify-center bg-teal-400 dark:bg-teal-600">
-                  <span className="text-[10px] font-bold text-white">3</span>
-                </div>
-                <div className="w-6 h-6 rounded flex items-center justify-center bg-green-400 dark:bg-green-600">
-                  <span className="text-[10px] font-bold text-white">4</span>
-                </div>
-                <div className="w-6 h-6 rounded flex items-center justify-center bg-yellow-400 dark:bg-yellow-600">
-                  <span className="text-[10px] font-bold text-white">5+</span>
-                </div>
-                <div className="w-6 h-6 rounded flex items-center justify-center bg-orange-400 dark:bg-orange-600">
-                  <span className="text-[10px] font-bold text-white">8+</span>
-                </div>
+            {/* Légende - dégradé compact */}
+            <div className="flex items-center justify-center gap-3 pt-3 border-t">
+              <span className="text-[10px] text-muted-foreground font-medium">Moins</span>
+              <div className="flex gap-0.5">
+                <div className="w-4 h-4 rounded-sm bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800"></div>
+                <div className="w-4 h-4 rounded-sm bg-emerald-100 dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-900"></div>
+                <div className="w-4 h-4 rounded-sm bg-emerald-200 dark:bg-emerald-900 border border-emerald-300 dark:border-emerald-800"></div>
+                <div className="w-4 h-4 rounded-sm bg-emerald-300 dark:bg-emerald-800 border border-emerald-400 dark:border-emerald-700"></div>
+                <div className="w-4 h-4 rounded-sm bg-emerald-400 dark:bg-emerald-700 border border-emerald-500 dark:border-emerald-600"></div>
+                <div className="w-4 h-4 rounded-sm bg-emerald-500 dark:bg-emerald-600 border border-emerald-600 dark:border-emerald-500"></div>
+                <div className="w-4 h-4 rounded-sm bg-emerald-600 dark:bg-emerald-500 border border-emerald-700 dark:border-emerald-400"></div>
+                <div className="w-4 h-4 rounded-sm bg-emerald-700 dark:bg-emerald-400 border border-emerald-800 dark:border-emerald-300"></div>
               </div>
-              <span className="text-xs text-muted-foreground font-medium">Plus d'activité</span>
+              <span className="text-[10px] text-muted-foreground font-medium">Plus</span>
             </div>
           </div>
         )}
