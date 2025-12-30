@@ -388,48 +388,6 @@ export default function FinancesPage() {
     }
   }
 
-  // Calculer la progression de l'objectif principal
-  const [selectedMetric, setSelectedMetric] = useState<'revenue' | 'profit'>('revenue')
-  
-  const calculateMainProgress = () => {
-    // Utiliser les valeurs actuelles de revenus ou bénéfices
-    let currentValue = selectedMetric === 'revenue' ? stats.totalRevenue : stats.profit
-    
-    // Si la valeur est négative (bénéfice négatif), on considère que c'est 0 pour le compteur
-    currentValue = Math.max(currentValue, 0)
-    
-    // Trouver l'objectif correspondant à la métrique sélectionnée
-    let targetValue = 0
-    
-    for (const objective of objectives) {
-      for (const kr of objective.keyResults) {
-        if ((selectedMetric === 'revenue' && kr.metric === 'revenue') ||
-            (selectedMetric === 'profit' && kr.metric === 'profit')) {
-          targetValue = Math.max(targetValue, kr.targetValue)
-        }
-      }
-    }
-    
-    // Si pas d'objectif défini, retourner 0
-    if (targetValue === 0) {
-      return 0
-    }
-    
-    // Calculer le pourcentage : (valeur actuelle / objectif) * 100
-    // Limité entre 0 et 100
-    const progress = Math.min(Math.max(Math.round((currentValue / targetValue) * 100), 0), 100)
-    
-    console.log(`Progression ${selectedMetric}:`, currentValue, '/', targetValue, '=', progress, '%')
-    
-    return progress
-  }
-
-  const mainProgress = calculateMainProgress()
-  const targetObjective = objectives.find(obj => 
-    obj.keyResults.some(kr => kr.metric === selectedMetric)
-  )
-  const targetValue = targetObjective?.keyResults.find(kr => kr.metric === selectedMetric)?.targetValue || 0
-  const currentActualValue = selectedMetric === 'revenue' ? stats.totalRevenue : stats.profit
 
   const statCards = [
     {
@@ -587,8 +545,8 @@ export default function FinancesPage() {
         })}
       </div>
 
-      {/* Indicateur de progression de l'objectif principal */}
-      {objectives.length > 0 && targetValue > 0 && (
+      {/* Indicateurs de progression - Revenus et Bénéfice */}
+      {objectives.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -598,56 +556,66 @@ export default function FinancesPage() {
             <CardHeader className="text-center pb-2">
               <CardTitle className="flex items-center justify-center gap-2">
                 <Target className="w-5 h-5 text-primary" />
-                Progression de votre objectif
+                Progression de vos objectifs
               </CardTitle>
               <CardDescription>
-                Suivi en temps réel de votre objectif financier principal
+                Suivi en temps réel de vos objectifs financiers
               </CardDescription>
             </CardHeader>
-            <CardContent className="flex flex-col items-center py-6">
-              {/* Sélecteur de métrique */}
-              <div className="flex gap-2 mb-6">
-                <Button
-                  variant={selectedMetric === 'revenue' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedMetric('revenue')}
-                  className={selectedMetric === 'revenue' ? 'bg-green-600 hover:bg-green-700' : ''}
-                >
-                  <TrendingUp className="w-4 h-4 mr-2" />
-                  Revenus
-                </Button>
-                <Button
-                  variant={selectedMetric === 'profit' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedMetric('profit')}
-                  className={selectedMetric === 'profit' ? 'bg-blue-600 hover:bg-blue-700' : ''}
-                >
-                  <DollarSign className="w-4 h-4 mr-2" />
-                  Bénéfice
-                </Button>
-              </div>
+            <CardContent className="py-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Indicateur Revenus */}
+                {(() => {
+                  const revenueObjective = objectives.find(obj => 
+                    obj.keyResults.some(kr => kr.metric === 'revenue')
+                  )
+                  const revenueTarget = revenueObjective?.keyResults.find(kr => kr.metric === 'revenue')?.targetValue || 0
+                  const revenueProgress = revenueTarget > 0 
+                    ? Math.min(Math.max(Math.round((stats.totalRevenue / revenueTarget) * 100), 0), 100)
+                    : 0
 
-              <Gauge 
-                value={mainProgress}
-                title={selectedMetric === 'revenue' ? 'Revenus actuels' : 'Bénéfice actuel'}
-                subtitle={`${formatCurrency(currentActualValue)} / ${formatCurrency(targetValue)}`}
-                size={280}
-              />
-              
-              <div className="mt-6 grid grid-cols-3 gap-4 w-full max-w-md">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-red-500">0-33%</div>
-                  <div className="text-xs text-muted-foreground">À améliorer</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-orange-500">34-66%</div>
-                  <div className="text-xs text-muted-foreground">En cours</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-green-500">67-100%</div>
-                  <div className="text-xs text-muted-foreground">Excellent</div>
-                </div>
+                  return revenueTarget > 0 ? (
+                    <div className="flex flex-col items-center">
+                      <Gauge 
+                        value={revenueProgress}
+                        title="Revenus"
+                        subtitle={`${formatCurrency(stats.totalRevenue)} / ${formatCurrency(revenueTarget)}`}
+                        size={250}
+                      />
+                    </div>
+                  ) : null
+                })()}
+
+                {/* Indicateur Bénéfice */}
+                {(() => {
+                  const profitObjective = objectives.find(obj => 
+                    obj.keyResults.some(kr => kr.metric === 'profit')
+                  )
+                  const profitTarget = profitObjective?.keyResults.find(kr => kr.metric === 'profit')?.targetValue || 0
+                  const currentProfit = Math.max(stats.profit, 0)
+                  const profitProgress = profitTarget > 0 
+                    ? Math.min(Math.max(Math.round((currentProfit / profitTarget) * 100), 0), 100)
+                    : 0
+
+                  return profitTarget > 0 ? (
+                    <div className="flex flex-col items-center">
+                      <Gauge 
+                        value={profitProgress}
+                        title="Bénéfice"
+                        subtitle={`${formatCurrency(stats.profit)} / ${formatCurrency(profitTarget)}`}
+                        size={250}
+                      />
+                    </div>
+                  ) : null
+                })()}
               </div>
+              
+              {/* Message si aucun objectif */}
+              {!objectives.some(obj => obj.keyResults.some(kr => kr.metric === 'revenue' || kr.metric === 'profit')) && (
+                <p className="text-center text-muted-foreground py-8">
+                  Créez un objectif avec des résultats clés "Revenus" ou "Bénéfice" pour voir les indicateurs.
+                </p>
+              )}
             </CardContent>
           </Card>
         </motion.div>
