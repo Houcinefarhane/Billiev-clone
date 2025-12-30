@@ -14,15 +14,20 @@ export async function GET(request: Request) {
     }
 
     const { searchParams } = new URL(request.url)
-    const period = searchParams.get('period') || 'all' // monthly, annual, all
-    const year = searchParams.get('year') ? parseInt(searchParams.get('year')!) : new Date().getFullYear()
+    const period = searchParams.get('period') // monthly, annual, ou null pour tous
+    const year = searchParams.get('year') ? parseInt(searchParams.get('year')!) : null
     const month = searchParams.get('month') ? parseInt(searchParams.get('month')!) : null
 
     let whereClause: any = {
       artisanId,
-      year,
     }
 
+    // Filtrer par année seulement si spécifié
+    if (year) {
+      whereClause.year = year
+    }
+
+    // Filtrer par période seulement si spécifié
     if (period === 'monthly' && month) {
       whereClause.period = 'monthly'
       whereClause.month = month

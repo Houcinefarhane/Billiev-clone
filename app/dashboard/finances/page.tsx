@@ -139,16 +139,14 @@ export default function FinancesPage() {
 
   const fetchObjectives = async () => {
     try {
-      const params = new URLSearchParams({
-        period: granularity === 'year' ? 'annual' : 'monthly',
-        year: selectedYear.toString(),
-        ...(granularity !== 'year' && { month: selectedMonth.toString() })
-      })
-      
-      const res = await fetch(`/api/financial-objectives?${params}`)
+      // Récupérer TOUS les objectifs pour l'affichage global
+      const res = await fetch('/api/financial-objectives')
       const data = await res.json()
       if (res.ok) {
         setObjectives(data)
+        console.log('Objectifs récupérés:', data)
+      } else {
+        console.error('Erreur API:', data)
       }
     } catch (error) {
       console.error('Error fetching objectives:', error)
@@ -392,20 +390,25 @@ export default function FinancesPage() {
 
   // Calculer la progression globale des objectifs
   const calculateOverallProgress = () => {
+    console.log('Calcul progression - Nombre objectifs:', objectives.length)
     if (objectives.length === 0) return 0
     
     let totalProgress = 0
     let totalKeyResults = 0
     
     objectives.forEach(objective => {
+      console.log('Objectif:', objective.title, '- Key Results:', objective.keyResults.length)
       objective.keyResults.forEach(kr => {
         totalKeyResults++
         const progress = kr.targetValue > 0 ? Math.min((kr.currentValue / kr.targetValue) * 100, 100) : 0
+        console.log(`  - ${kr.title}: ${kr.currentValue}/${kr.targetValue} = ${progress}%`)
         totalProgress += progress
       })
     })
     
-    return totalKeyResults > 0 ? Math.round(totalProgress / totalKeyResults) : 0
+    const result = totalKeyResults > 0 ? Math.round(totalProgress / totalKeyResults) : 0
+    console.log('Progression globale:', result, '%')
+    return result
   }
 
   const overallProgress = calculateOverallProgress()
@@ -413,6 +416,8 @@ export default function FinancesPage() {
     const allAchieved = obj.keyResults.every(kr => kr.currentValue >= kr.targetValue)
     return allAchieved ? count + 1 : count
   }, 0)
+  
+  console.log('Affichage indicateur - Objectifs:', objectives.length, 'Progression:', overallProgress)
 
   const statCards = [
     {
