@@ -109,35 +109,37 @@ export default function HomePage() {
               onHoverStart={() => setShowScreenshot(true)}
               onHoverEnd={() => setShowScreenshot(false)}
             >
-              <div className="relative w-full aspect-video rounded-2xl overflow-hidden border-2 border-gray-200 shadow-2xl" style={{ background: 'linear-gradient(to bottom right, rgba(150, 185, 220, 0.1), white)' }}>
+              <div className="relative w-full aspect-video rounded-2xl overflow-hidden border-2 border-gray-200 shadow-2xl bg-white">
                 <motion.div
                   animate={{
                     scale: showScreenshot ? 1.05 : 1,
                     opacity: showScreenshot ? 1 : 0.3,
                   }}
                   transition={{ duration: 0.5 }}
-                  className="absolute inset-0 flex items-center justify-center"
-                  style={{ background: 'linear-gradient(to bottom right, rgba(150, 185, 220, 0.2), rgba(150, 185, 220, 0.1))' }}
+                  className="absolute inset-0"
                 >
                   {showScreenshot ? (
                     <motion.div
-                      initial={{ opacity: 0, scale: 0.9 }}
+                      initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ duration: 0.4 }}
-                      className="w-full h-full bg-white rounded-lg shadow-xl p-4"
+                      className="w-full h-full relative"
                     >
-                      <div className="w-full h-full bg-gray-50 rounded border border-gray-200 flex items-center justify-center">
-                        <div className="text-center">
-                          <BarChart3 className="w-16 h-16 mx-auto mb-4" style={{ color: 'rgb(150, 185, 220)' }} />
-                          <p className="text-gray-600 font-medium">Aperçu du dashboard</p>
-                          <p className="text-sm text-gray-500 mt-2">Capture d'écran du logiciel</p>
-                        </div>
-                      </div>
+                      <Image
+                        src="/dashboard-screenshot.png"
+                        alt="Aperçu du dashboard ArtisanPro"
+                        fill
+                        className="object-contain rounded-lg"
+                        priority
+                        sizes="(max-width: 1024px) 0vw, 50vw"
+                      />
                     </motion.div>
                   ) : (
-                    <div className="text-center">
-                      <BarChart3 className="w-20 h-20 mx-auto mb-4" style={{ color: 'rgba(150, 185, 220, 0.5)' }} />
-                      <p className="text-gray-400 font-medium">Survolez pour voir l'aperçu</p>
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-50 to-white">
+                      <div className="text-center">
+                        <BarChart3 className="w-20 h-20 mx-auto mb-4" style={{ color: 'rgba(150, 185, 220, 0.5)' }} />
+                        <p className="text-gray-400 font-medium">Survolez pour voir l'aperçu</p>
+                      </div>
                     </div>
                   )}
                 </motion.div>
