@@ -28,6 +28,7 @@ export const authOptions: NextAuthOptions = {
                 emailVerified: true, // Email vérifié via Google
               },
             })
+            console.log('✅ Compte Artisan créé via Google OAuth:', user.email)
           } else if (!existingArtisan.emailVerified) {
             // Mettre à jour si l'email n'était pas vérifié
             await prisma.artisan.update({
@@ -37,13 +38,22 @@ export const authOptions: NextAuthOptions = {
                 name: user.name || existingArtisan.name,
               },
             })
+            console.log('✅ Compte Artisan mis à jour via Google OAuth:', user.email)
+          } else {
+            console.log('✅ Compte Artisan existant connecté via Google OAuth:', user.email)
           }
         } catch (error) {
-          console.error('Error creating/updating artisan from OAuth:', error)
+          console.error('❌ Error creating/updating artisan from OAuth:', error)
           return false
         }
       }
       return true
+    },
+    async redirect({ url, baseUrl }) {
+      // Rediriger vers /dashboard après connexion OAuth
+      if (url.startsWith('/')) return `${baseUrl}${url}`
+      if (new URL(url).origin === baseUrl) return url
+      return `${baseUrl}/dashboard`
     },
     async session({ session, token }) {
       // Récupérer artisanId depuis le token (déjà stocké dans jwt callback)
@@ -72,17 +82,19 @@ export const authOptions: NextAuthOptions = {
       return session
     },
     async jwt({ token, user, account }) {
-      // Lors de la première connexion OAuth
-      if (account?.provider === 'google' && user?.email) {
+      // Lors de la première connexion OAuth ou si artisanId pas encore dans le token
+      if (user?.email && (!token.artisanId || account?.provider === 'google')) {
         const artisan = await prisma.artisan.findUnique({
           where: { email: user.email },
           select: { id: true },
         })
         if (artisan) {
           token.artisanId = artisan.id
+          console.log('✅ artisanId ajouté au token JWT:', artisan.id)
+        } else {
+          console.warn('⚠️ Artisan non trouvé pour email:', user.email)
         }
       }
-      // Si artisanId déjà dans le token, le garder
       return token
     },
   },
