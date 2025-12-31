@@ -8,13 +8,14 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { 
   TrendingUp, TrendingDown, DollarSign, ArrowUpRight, ArrowDownRight, 
-  Plus, X, Edit, Trash2, Download, Calendar, Filter
+  Plus, X, Edit, Trash2, Download, Calendar, Filter, Target
 } from 'lucide-react'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, Cell } from 'recharts'
 import { exportExpenses, exportInvoices } from '@/lib/export'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
+import { Gauge } from '@/components/ui/gauge'
 
 interface Expense {
   id: string
@@ -23,6 +24,26 @@ interface Expense {
   amount: number
   date: string
   receipt: string | null
+}
+
+interface KeyResult {
+  id: string
+  title: string
+  metric: string
+  targetValue: number
+  currentValue: number
+  unit: string
+}
+
+interface FinancialObjective {
+  id: string
+  title: string
+  description: string | null
+  period: string
+  year: number
+  month: number | null
+  status: string
+  keyResults: KeyResult[]
 }
 
 type Granularity = 'week' | 'month' | 'year'
@@ -40,6 +61,7 @@ export default function FinancesPage() {
     chartData: [] as any[],
   })
   
+  const [objectives, setObjectives] = useState<FinancialObjective[]>([])
   const [expenses, setExpenses] = useState<Expense[]>([])
   const [loading, setLoading] = useState(true)
   const [showExpenseForm, setShowExpenseForm] = useState(false)
@@ -67,6 +89,7 @@ export default function FinancesPage() {
   useEffect(() => {
     fetchFinancialData()
     fetchExpenses()
+    fetchObjectives()
   }, [granularity, selectedYear, selectedMonth])
 
   const fetchFinancialData = async () => {
@@ -98,6 +121,18 @@ export default function FinancesPage() {
       }
     } catch (error) {
       console.error('Error fetching expenses:', error)
+    }
+  }
+
+  const fetchObjectives = async () => {
+    try {
+      const res = await fetch('/api/financial-objectives')
+      const data = await res.json()
+      if (res.ok) {
+        setObjectives(data)
+      }
+    } catch (error) {
+      console.error('Error fetching objectives:', error)
     }
   }
 
@@ -376,11 +411,87 @@ export default function FinancesPage() {
         })}
       </div>
 
+      {/* Indicateurs de progression - Revenus et Bénéfice */}
+      {objectives.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <Card className="border-2 border-primary/20">
+            <CardHeader className="text-center pb-2">
+              <CardTitle className="flex items-center justify-center gap-2">
+                <Target className="w-5 h-5 text-primary" />
+                Progression de vos objectifs
+              </CardTitle>
+              <CardDescription>
+                Suivi en temps réel de vos objectifs financiers
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="py-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Indicateur Revenus */}
+                {(() => {
+                  const revenueObjective = objectives.find(obj => 
+                    obj.keyResults.some(kr => kr.metric === 'revenue')
+                  )
+                  const revenueTarget = revenueObjective?.keyResults.find(kr => kr.metric === 'revenue')?.targetValue || 0
+                  const revenueProgress = revenueTarget > 0 
+                    ? Math.min(Math.max(Math.round((stats.totalRevenue / revenueTarget) * 100), 0), 100)
+                    : 0
+
+                  return revenueTarget > 0 ? (
+                    <div className="flex flex-col items-center">
+                      <Gauge 
+                        value={revenueProgress}
+                        title="Revenus"
+                        subtitle={`${formatCurrency(stats.totalRevenue)} / ${formatCurrency(revenueTarget)}`}
+                        size={250}
+                      />
+                    </div>
+                  ) : null
+                })()}
+
+                {/* Indicateur Bénéfice */}
+                {(() => {
+                  const profitObjective = objectives.find(obj => 
+                    obj.keyResults.some(kr => kr.metric === 'profit')
+                  )
+                  const profitTarget = profitObjective?.keyResults.find(kr => kr.metric === 'profit')?.targetValue || 0
+                  const currentProfit = Math.max(stats.profit, 0)
+                  const profitProgress = profitTarget > 0 
+                    ? Math.min(Math.max(Math.round((currentProfit / profitTarget) * 100), 0), 100)
+                    : 0
+
+                  return profitTarget > 0 ? (
+                    <div className="flex flex-col items-center">
+                      <Gauge 
+                        value={profitProgress}
+                        title="Bénéfice"
+                        subtitle={`${formatCurrency(stats.profit)} / ${formatCurrency(profitTarget)}`}
+                        size={250}
+                      />
+                    </div>
+                  ) : null
+                })()}
+              </div>
+              
+              {/* Message si aucun objectif */}
+              {!objectives.some(obj => obj.keyResults.some(kr => kr.metric === 'revenue' || kr.metric === 'profit')) && (
+                <p className="text-center text-muted-foreground py-8">
+                  Créez un objectif avec des résultats clés "Revenus" ou "Bénéfice" pour voir les indicateurs.
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
       {/* Graphique */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
+        transition={{ delay: objectives.length > 0 ? 0.4 : 0.3 }}
       >
         <Card>
           <CardHeader>
