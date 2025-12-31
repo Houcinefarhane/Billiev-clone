@@ -299,6 +299,19 @@ async function main() {
   
   console.log(`  ${interventions.length} interventions créées au total`)
 
+  // Calculer les mois entre startDate et endDate pour les factures/devis/dépenses
+  const invoiceMonths = []
+  const currentMonth = new Date(startDate.getFullYear(), startDate.getMonth(), 1)
+  const lastMonth = new Date(endDate.getFullYear(), endDate.getMonth(), 1)
+  
+  while (currentMonth <= lastMonth) {
+    invoiceMonths.push({
+      year: currentMonth.getFullYear(),
+      month: currentMonth.getMonth()
+    })
+    currentMonth.setMonth(currentMonth.getMonth() + 1)
+  }
+
   // Générer des devis (40) - Répartis équitablement par mois avec variations
   console.log('Création de 40 devis (lissés par mois)...')
   const quotes = []
@@ -455,19 +468,6 @@ async function main() {
   
   let invoiceCounter = maxInvoiceNumber + 1
   console.log(` 🔢 Début de la numérotation à FAC-${invoiceCounter.toString().padStart(4, '0')}`)
-  
-  // Calculer les mois entre startDate et endDate
-  const invoiceMonths = []
-  const currentMonth = new Date(startDate.getFullYear(), startDate.getMonth(), 1)
-  const lastMonth = new Date(endDate.getFullYear(), endDate.getMonth(), 1)
-  
-  while (currentMonth <= lastMonth) {
-    invoiceMonths.push({
-      year: currentMonth.getFullYear(),
-      month: currentMonth.getMonth()
-    })
-    currentMonth.setMonth(currentMonth.getMonth() + 1)
-  }
   
   const baseInvoicesPerMonth = Math.floor(60 / invoiceMonths.length)
   console.log(`  Répartition: ~${baseInvoicesPerMonth} factures par mois avec variations`)
