@@ -13,7 +13,8 @@ import {
   Zap,
   Shield,
   ArrowRight,
-  CheckCircle2
+  CheckCircle2,
+  ChevronDown
 } from 'lucide-react'
 import { Logo } from '@/components/Logo'
 import { useState } from 'react'
@@ -21,6 +22,7 @@ import { DashboardScreenshot } from '@/components/DashboardScreenshot'
 
 export default function HomePage() {
   const [hoveredFeature, setHoveredFeature] = useState<number | null>(null)
+  const [openFaq, setOpenFaq] = useState<number | null>(null)
 
   return (
     <div className="min-h-screen bg-white">
@@ -333,6 +335,69 @@ export default function HomePage() {
           </motion.div>
         </div>
       </section>
+
+      {/* FAQ Section */}
+      <section className="py-24 bg-white">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: 'rgb(150, 185, 220)' }}>
+              Questions fréquentes
+            </h2>
+            <p className="text-lg text-gray-600">
+              Tout ce que vous devez savoir sur notre solution
+            </p>
+          </motion.div>
+
+          <div className="space-y-4">
+            {faqData.map((faq, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow"
+              >
+                <button
+                  onClick={() => setOpenFaq(openFaq === index ? null : index)}
+                  className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
+                >
+                  <span className="text-lg font-semibold text-gray-900 pr-8">
+                    {faq.question}
+                  </span>
+                  <ChevronDown
+                    className={`w-5 h-5 flex-shrink-0 transition-transform duration-300 ${
+                      openFaq === index ? 'rotate-180' : ''
+                    }`}
+                    style={{ color: 'rgb(150, 185, 220)' }}
+                  />
+                </button>
+                <motion.div
+                  initial={false}
+                  animate={{
+                    height: openFaq === index ? 'auto' : 0,
+                    opacity: openFaq === index ? 1 : 0,
+                  }}
+                  transition={{ duration: 0.3 }}
+                  className="overflow-hidden"
+                >
+                  <div className="px-6 pb-5 pt-0">
+                    <p className="text-gray-600 leading-relaxed">
+                      {faq.answer}
+                    </p>
+                  </div>
+                </motion.div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
     </div>
   )
 }
@@ -415,5 +480,40 @@ const benefits = [
     title: 'Moderne',
     icon: BarChart3,
     description: 'Des outils modernes et performants pour gérer votre activité efficacement.',
+  },
+]
+
+const faqData = [
+  {
+    question: 'Comment créer mon compte ?',
+    answer: 'La création de compte est simple et gratuite. Cliquez sur "Créer mon compte" et remplissez le formulaire avec vos informations. Vous pourrez commencer à utiliser la plateforme immédiatement après votre inscription.',
+  },
+  {
+    question: 'Quels sont les tarifs ?',
+    answer: 'Nous proposons un plan gratuit qui vous permet de découvrir toutes les fonctionnalités essentielles. Des options premium sont disponibles pour les besoins plus avancés.',
+  },
+  {
+    question: 'Mes données sont-elles sécurisées ?',
+    answer: 'Absolument. Nous utilisons les dernières technologies de sécurité, incluant le chiffrement des données, des sauvegardes régulières et une authentification sécurisée. Vos données sont stockées de manière sécurisée et ne sont jamais partagées avec des tiers.',
+  },
+  {
+    question: 'Puis-je exporter mes données ?',
+    answer: 'Oui, vous pouvez exporter vos données à tout moment. La plupart des modules (factures, devis, clients) permettent l\'export en PDF ou en formats standards pour une portabilité totale.',
+  },
+  {
+    question: 'Y a-t-il une application mobile ?',
+    answer: 'Notre solution est entièrement responsive et fonctionne parfaitement sur tous les appareils mobiles via votre navigateur. Une application mobile native est en développement.',
+  },
+  {
+    question: 'Puis-je personnaliser les documents (factures, devis) ?',
+    answer: 'Oui, vous pouvez personnaliser vos documents avec votre logo, vos couleurs et vos informations. Des templates sont disponibles, et vous pouvez créer vos propres modèles.',
+  },
+  {
+    question: 'Comment fonctionne le support client ?',
+    answer: 'Notre équipe est disponible pour vous aider. Vous pouvez nous contacter via le formulaire de contact ou consulter notre documentation complète pour trouver des réponses à vos questions.',
+  },
+  {
+    question: 'Puis-je migrer mes données depuis un autre système ?',
+    answer: 'Oui, nous proposons des outils d\'import pour faciliter la migration de vos données depuis d\'autres systèmes. Contactez notre support pour obtenir de l\'aide dans ce processus.',
   },
 ]
