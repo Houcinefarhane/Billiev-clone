@@ -1,7 +1,6 @@
 import { NextAuthOptions } from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
 import { prisma } from './prisma'
-import { compare } from 'bcryptjs'
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -47,7 +46,13 @@ export const authOptions: NextAuthOptions = {
       return true
     },
     async session({ session, token }) {
-      if (session.user?.email) {
+      // Récupérer artisanId depuis le token (déjà stocké dans jwt callback)
+      if (token.artisanId) {
+        ;(session as any).artisanId = token.artisanId
+      }
+      
+      // Si pas dans le token, chercher par email
+      if (!token.artisanId && session.user?.email) {
         const artisan = await prisma.artisan.findUnique({
           where: { email: session.user.email },
           select: {
@@ -60,7 +65,6 @@ export const authOptions: NextAuthOptions = {
         })
 
         if (artisan) {
-          // Ajouter l'ID artisan à la session
           ;(session as any).artisanId = artisan.id
           session.user.name = artisan.name
         }
@@ -68,6 +72,7 @@ export const authOptions: NextAuthOptions = {
       return session
     },
     async jwt({ token, user, account }) {
+      // Lors de la première connexion OAuth
       if (account?.provider === 'google' && user?.email) {
         const artisan = await prisma.artisan.findUnique({
           where: { email: user.email },
@@ -77,6 +82,7 @@ export const authOptions: NextAuthOptions = {
           token.artisanId = artisan.id
         }
       }
+      // Si artisanId déjà dans le token, le garder
       return token
     },
   },
