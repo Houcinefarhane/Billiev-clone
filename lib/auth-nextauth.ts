@@ -62,6 +62,17 @@ export const authOptions: NextAuthOptions = {
             }
           }
           
+          // Vérifier que le compte a bien été créé/mis à jour
+          const verifyArtisan = await prisma.artisan.findUnique({
+            where: { email },
+          })
+          
+          if (!verifyArtisan) {
+            console.error('❌ CRITIQUE: Le compte n\'a pas été créé malgré le succès apparent')
+            return false
+          }
+          
+          console.log('✅ Vérification: Compte confirmé dans la DB:', verifyArtisan.email)
           return true
         } catch (error: any) {
           console.error('❌ Error creating/updating artisan from OAuth:', {
@@ -69,10 +80,8 @@ export const authOptions: NextAuthOptions = {
             code: error?.code,
             stack: error?.stack,
           })
-          // Ne pas bloquer la connexion si l'erreur est mineure
-          // Retourner true pour permettre la connexion même en cas d'erreur de DB
-          console.warn('⚠️ Continuation malgré l\'erreur pour permettre la connexion')
-          return true
+          // Retourner false pour bloquer la connexion si erreur critique
+          return false
         }
       }
       

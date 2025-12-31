@@ -8,6 +8,12 @@ export async function getCurrentArtisan() {
     // PRIORITÉ 1: Vérifier NextAuth session (OAuth Google) - prioritaire car plus récent
     const session = await getServerSession(authOptions)
     
+    console.log('getCurrentArtisan - Session NextAuth:', {
+      hasSession: !!session,
+      email: session?.user?.email,
+      artisanId: (session as any)?.artisanId,
+    })
+    
     if (session?.user?.email) {
       const email = session.user.email.toLowerCase().trim()
       const artisan = await prisma.artisan.findUnique({
@@ -22,11 +28,15 @@ export async function getCurrentArtisan() {
       })
 
       if (artisan) {
-        console.log('getCurrentArtisan - Artisan trouvé via NextAuth session:', artisan.email)
+        console.log('✅ getCurrentArtisan - Artisan trouvé via NextAuth session:', artisan.email)
         // Si session NextAuth existe, on ignore les cookies custom pour éviter les conflits
         return artisan
       } else {
-        console.warn('getCurrentArtisan - Session NextAuth trouvée mais artisan non trouvé pour:', email)
+        console.warn('⚠️ getCurrentArtisan - Session NextAuth trouvée mais artisan non trouvé pour:', email)
+        console.warn('⚠️ Le compte Google n\'a peut-être pas été créé lors de la connexion OAuth')
+        // Si session NextAuth existe mais pas de compte, on ne fallback PAS sur les cookies
+        // pour éviter de se connecter sur le mauvais compte
+        return null
       }
     }
 
@@ -34,6 +44,8 @@ export async function getCurrentArtisan() {
     // Seulement si pas de session NextAuth active
     const cookieStore = await cookies()
     const artisanId = cookieStore.get('artisanId')?.value
+
+    console.log('getCurrentArtisan - Cookie artisanId:', artisanId ? 'présent' : 'absent')
 
     if (artisanId) {
       const artisan = await prisma.artisan.findUnique({
@@ -48,15 +60,15 @@ export async function getCurrentArtisan() {
       })
 
       if (artisan) {
-        console.log('getCurrentArtisan - Artisan trouvé via cookie:', artisan.email)
+        console.log('✅ getCurrentArtisan - Artisan trouvé via cookie:', artisan.email)
         return artisan
       }
     }
 
-    console.log('getCurrentArtisan - Aucun artisan trouvé')
+    console.log('❌ getCurrentArtisan - Aucun artisan trouvé')
     return null
   } catch (error) {
-    console.error('getCurrentArtisan - Erreur:', error)
+    console.error('❌ getCurrentArtisan - Erreur:', error)
     return null
   }
 }
