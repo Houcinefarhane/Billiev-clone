@@ -449,7 +449,7 @@ export default function DashboardPage() {
               </div>
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-2 lg:gap-3">
-                {recentActivity.slice(0, 4).map((activity, index) => (
+                {recentActivity.slice(0, 4).map((activity: RecentActivity, index) => (
                   <motion.div
                     key={index}
                     initial={{ opacity: 0, x: -20 }}
