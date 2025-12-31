@@ -18,7 +18,7 @@ import {
 } from 'lucide-react'
 import { Logo } from '@/components/Logo'
 import { useState } from 'react'
-import { DashboardScreenshot } from '@/components/DashboardScreenshot'
+import Image from 'next/image'
 
 export default function HomePage() {
   const [hoveredFeature, setHoveredFeature] = useState<number | null>(null)
@@ -115,7 +115,29 @@ export default function HomePage() {
                   transition={{ duration: 0.6, delay: 0.8 }}
                   className="w-full h-full relative rounded-lg overflow-hidden"
                 >
-                  <DashboardScreenshot />
+                  <Image
+                    src="/dashboard-screenshot.png"
+                    alt="Aperçu du tableau de bord"
+                    fill
+                    className="object-contain"
+                    priority
+                    onError={(e) => {
+                      // Fallback si l'image n'existe pas encore
+                      const target = e.target as HTMLImageElement
+                      target.style.display = 'none'
+                      const fallback = document.createElement('div')
+                      fallback.className = 'w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-50 to-white'
+                      fallback.innerHTML = `
+                        <div class="text-center">
+                          <svg class="w-20 h-20 mx-auto mb-4" style="color: rgba(150, 185, 220, 0.5);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                          </svg>
+                          <p class="text-gray-400 font-medium">Ajoutez dashboard-screenshot.png dans /public</p>
+                        </div>
+                      `
+                      target.parentElement?.appendChild(fallback)
+                    }}
+                  />
                 </motion.div>
               </div>
             </motion.div>
