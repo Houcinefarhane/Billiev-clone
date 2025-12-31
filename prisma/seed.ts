@@ -140,10 +140,10 @@ async function main() {
   
   console.log(`Artisan trouvé/créé: ${artisan.email}`)
 
-  // Générer des clients (500)
-  console.log('Création de 500 clients...')
+  // Générer des clients (50)
+  console.log('Création de 50 clients...')
   const clients = []
-  for (let i = 0; i < 500; i++) {
+  for (let i = 0; i < 50; i++) {
     const firstName = randomElement(firstNames)
     const lastName = randomElement(lastNames)
     const city = randomElement(cities)
@@ -163,15 +163,15 @@ async function main() {
     })
     clients.push(client)
     
-    if ((i + 1) % 50 === 0) {
-      console.log(`  ${i + 1}/500 clients créés`)
+    if ((i + 1) % 10 === 0) {
+      console.log(`  ${i + 1}/50 clients créés`)
     }
   }
 
-  // Générer des items de stock (200)
-  console.log('Création de 200 items de stock...')
+  // Générer des items de stock (20)
+  console.log('Création de 20 items de stock...')
   const stockItems = []
-  for (let i = 0; i < 200; i++) {
+  for (let i = 0; i < 20; i++) {
     const material = randomElement(materials)
     const stockItem = await prisma.stockItem.create({
       data: {
@@ -186,8 +186,8 @@ async function main() {
     })
     stockItems.push(stockItem)
     
-    if ((i + 1) % 50 === 0) {
-      console.log(`  ${i + 1}/200 items de stock créés`)
+    if ((i + 1) % 5 === 0) {
+      console.log(`  ${i + 1}/20 items de stock créés`)
     }
   }
 
@@ -299,8 +299,8 @@ async function main() {
   
   console.log(`  ${interventions.length} interventions créées au total`)
 
-  // Générer des devis (400)
-  console.log('Création de 400 devis...')
+  // Générer des devis (40)
+  console.log('Création de 40 devis...')
   const quotes = []
   const quoteStatuses = ['draft', 'sent', 'accepted', 'rejected', 'converted'] as const
 
@@ -324,7 +324,7 @@ async function main() {
   let quoteCounter = maxQuoteNumber + 1
   console.log(` 🔢 Début de la numérotation à DEV-${quoteCounter.toString().padStart(4, '0')}`)
 
-  for (let i = 0; i < 400; i++) {
+  for (let i = 0; i < 40; i++) {
     const client = randomElement(clients)
     const date = randomDate(startDate, endDate)
     const status = randomElement([...quoteStatuses])
@@ -404,13 +404,13 @@ async function main() {
 
     quotes.push(quote)
     
-    if ((i + 1) % 50 === 0) {
-      console.log(`  ${i + 1}/400 devis créés`)
+    if ((i + 1) % 10 === 0) {
+      console.log(`  ${i + 1}/40 devis créés`)
     }
   }
 
-  // Générer des factures (600)
-  console.log('Création de 600 factures...')
+  // Générer des factures (60)
+  console.log('Création de 60 factures...')
   const invoices = []
   const invoiceStatuses = ['draft', 'sent', 'paid', 'overdue'] as const
   
@@ -434,7 +434,7 @@ async function main() {
   let invoiceCounter = maxInvoiceNumber + 1
   console.log(` 🔢 Début de la numérotation à FAC-${invoiceCounter.toString().padStart(4, '0')}`)
 
-  for (let i = 0; i < 600; i++) {
+  for (let i = 0; i < 60; i++) {
     const client = randomElement(clients)
     const date = randomDate(startDate, endDate)
     const status = randomElement([...invoiceStatuses])
@@ -514,14 +514,14 @@ async function main() {
 
     invoices.push(invoice)
     
-    if ((i + 1) % 100 === 0) {
-      console.log(`  ${i + 1}/600 factures créées`)
+    if ((i + 1) % 10 === 0) {
+      console.log(`  ${i + 1}/60 factures créées`)
     }
   }
 
-  // Générer des dépenses (300)
-  console.log('Création de 300 dépenses...')
-  for (let i = 0; i < 300; i++) {
+  // Générer des dépenses (30)
+  console.log('Création de 30 dépenses...')
+  for (let i = 0; i < 30; i++) {
     const date = randomDate(startDate, endDate)
     const category = randomElement(expenseCategories)
     
@@ -535,17 +535,17 @@ async function main() {
       }
     })
     
-    if ((i + 1) % 50 === 0) {
-      console.log(`  ${i + 1}/300 dépenses créées`)
+    if ((i + 1) % 10 === 0) {
+      console.log(`  ${i + 1}/30 dépenses créées`)
     }
   }
 
-  // Générer des notifications (200)
-  console.log('Création de 200 notifications...')
+  // Générer des notifications (20)
+  console.log('Création de 20 notifications...')
   const notificationTypes = ['intervention_reminder', 'invoice_overdue', 'low_stock', 'intervention_status'] as const
   const notificationStatuses = ['unread', 'read'] as const
 
-  for (let i = 0; i < 200; i++) {
+  for (let i = 0; i < 20; i++) {
     const type = randomElement([...notificationTypes])
     const status = randomElement([...notificationStatuses])
     const createdAt = randomDate(startDate, endDate)
@@ -583,8 +583,8 @@ async function main() {
       }
     })
     
-    if ((i + 1) % 50 === 0) {
-      console.log(`  ${i + 1}/200 notifications créées`)
+    if ((i + 1) % 5 === 0) {
+      console.log(`  ${i + 1}/20 notifications créées`)
     }
   }
 
@@ -597,8 +597,8 @@ async function main() {
   console.log(`  - ${interventions.length} interventions`)
   console.log(`  - ${quotes.length} devis`)
   console.log(`  - ${invoices.length} factures`)
-  console.log(`  - 300 dépenses`)
-  console.log(`  - 200 notifications`)
+  console.log(`  - 30 dépenses`)
+  console.log(`  - 20 notifications`)
   console.log('')
   console.log('Identifiants de connexion:')
   console.log(`  Email: ${artisan.email}`)
