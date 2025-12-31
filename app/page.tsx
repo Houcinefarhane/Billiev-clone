@@ -28,7 +28,7 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="relative overflow-hidden pt-20 pb-32">
         {/* Background gradient - seulement bleu pastel */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-blue-50" />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom right, rgba(150, 185, 220, 0.1), white, rgba(150, 185, 220, 0.1))' }} />
         
         <div className="container mx-auto px-4 relative z-10 max-w-6xl">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -55,7 +55,7 @@ export default function HomePage() {
                 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 tracking-tight text-gray-900"
               >
                 Gérez votre activité
-                <span className="block mt-2 text-blue-500">
+                <span className="block mt-2" style={{ color: 'rgb(150, 185, 220)' }}>
                   en toute simplicité
                 </span>
               </motion.h1>
@@ -79,7 +79,10 @@ export default function HomePage() {
                 <Link href="/auth/register">
                   <Button 
                     size="lg" 
-                    className="text-lg px-8 py-6 h-14 bg-blue-500 text-white hover:bg-blue-600 font-medium shadow-lg hover:shadow-xl transition-all duration-300 group"
+                    className="text-lg px-8 py-6 h-14 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-300 group"
+                    style={{ backgroundColor: 'rgb(150, 185, 220)' }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgb(130, 165, 200)'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgb(150, 185, 220)'}
                   >
                     Commencer gratuitement
                     <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -106,14 +109,15 @@ export default function HomePage() {
               onHoverStart={() => setShowScreenshot(true)}
               onHoverEnd={() => setShowScreenshot(false)}
             >
-              <div className="relative w-full aspect-video rounded-2xl overflow-hidden border-2 border-gray-200 bg-gradient-to-br from-blue-50 to-white shadow-2xl">
+              <div className="relative w-full aspect-video rounded-2xl overflow-hidden border-2 border-gray-200 shadow-2xl" style={{ background: 'linear-gradient(to bottom right, rgba(150, 185, 220, 0.1), white)' }}>
                 <motion.div
                   animate={{
                     scale: showScreenshot ? 1.05 : 1,
                     opacity: showScreenshot ? 1 : 0.3,
                   }}
                   transition={{ duration: 0.5 }}
-                  className="absolute inset-0 bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center"
+                  className="absolute inset-0 flex items-center justify-center"
+                  style={{ background: 'linear-gradient(to bottom right, rgba(150, 185, 220, 0.2), rgba(150, 185, 220, 0.1))' }}
                 >
                   {showScreenshot ? (
                     <motion.div
@@ -124,7 +128,7 @@ export default function HomePage() {
                     >
                       <div className="w-full h-full bg-gray-50 rounded border border-gray-200 flex items-center justify-center">
                         <div className="text-center">
-                          <BarChart3 className="w-16 h-16 text-blue-500 mx-auto mb-4" />
+                          <BarChart3 className="w-16 h-16 mx-auto mb-4" style={{ color: 'rgb(150, 185, 220)' }} />
                           <p className="text-gray-600 font-medium">Aperçu du dashboard</p>
                           <p className="text-sm text-gray-500 mt-2">Capture d'écran du logiciel</p>
                         </div>
@@ -132,7 +136,7 @@ export default function HomePage() {
                     </motion.div>
                   ) : (
                     <div className="text-center">
-                      <BarChart3 className="w-20 h-20 text-blue-300 mx-auto mb-4" />
+                      <BarChart3 className="w-20 h-20 mx-auto mb-4" style={{ color: 'rgba(150, 185, 220, 0.5)' }} />
                       <p className="text-gray-400 font-medium">Survolez pour voir l'aperçu</p>
                     </div>
                   )}
@@ -152,7 +156,8 @@ export default function HomePage() {
             repeat: Infinity,
             ease: "easeInOut"
           }}
-          className="absolute top-20 left-10 w-20 h-20 bg-blue-200 rounded-full opacity-20 blur-xl"
+          className="absolute top-20 left-10 w-20 h-20 rounded-full opacity-20 blur-xl"
+          style={{ backgroundColor: 'rgb(150, 185, 220)' }}
         />
         <motion.div
           animate={{
@@ -164,7 +169,8 @@ export default function HomePage() {
             ease: "easeInOut",
             delay: 1
           }}
-          className="absolute bottom-20 right-10 w-32 h-32 bg-blue-200 rounded-full opacity-20 blur-xl"
+          className="absolute bottom-20 right-10 w-32 h-32 rounded-full opacity-20 blur-xl"
+          style={{ backgroundColor: 'rgb(150, 185, 220)' }}
         />
       </section>
 
@@ -198,13 +204,16 @@ export default function HomePage() {
                 onHoverEnd={() => setHoveredFeature(null)}
                 className="group"
               >
-                <div className={`
-                  relative h-full p-6 rounded-2xl border-2 transition-all duration-500
-                  ${hoveredFeature === index 
-                    ? 'border-blue-400 bg-blue-50 shadow-2xl scale-105' 
-                    : 'border-gray-200 bg-white hover:border-gray-300 shadow-lg hover:shadow-xl'
-                  }
-                `}>
+                <div 
+                  className={`
+                    relative h-full p-6 rounded-2xl border-2 transition-all duration-500
+                    ${hoveredFeature === index 
+                      ? 'shadow-2xl scale-105' 
+                      : 'border-gray-200 bg-white hover:border-gray-300 shadow-lg hover:shadow-xl'
+                    }
+                  `}
+                  style={hoveredFeature === index ? { borderColor: 'rgba(150, 185, 220, 0.7)', backgroundColor: 'rgba(150, 185, 220, 0.1)' } : {}}
+                >
                   {/* Icon */}
                   <motion.div
                     animate={{
@@ -215,15 +224,21 @@ export default function HomePage() {
                     className={`
                       w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-all duration-500
                       ${hoveredFeature === index 
-                        ? 'bg-blue-500 text-white shadow-lg' 
-                        : 'bg-gray-100 text-gray-700 group-hover:bg-blue-100'
+                        ? 'text-white shadow-lg' 
+                        : 'bg-gray-100 text-gray-700'
                       }
                     `}
+                    style={hoveredFeature === index 
+                      ? { backgroundColor: 'rgb(150, 185, 220)' }
+                      : hoveredFeature === null ? {} : { backgroundColor: 'rgba(150, 185, 220, 0.2)' }
+                    }
                   >
                     <feature.icon className="w-6 h-6" strokeWidth={2} />
                   </motion.div>
 
-                  <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2 transition-colors"
+                      style={hoveredFeature === index ? { color: 'rgb(150, 185, 220)' } : {}}
+                  >
                     {feature.title}
                   </h3>
                   <p className="text-gray-600 leading-relaxed mb-4 text-sm">
@@ -252,7 +267,7 @@ export default function HomePage() {
                           transition={{ delay: i * 0.1 }}
                           className="flex items-center gap-2 text-xs text-gray-600"
                         >
-                          <CheckCircle2 className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
+                          <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'rgb(150, 185, 220)' }} />
                           <span>{benefit}</span>
                         </motion.li>
                       ))}
@@ -264,7 +279,8 @@ export default function HomePage() {
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      className="absolute inset-0 bg-blue-50/50 rounded-2xl pointer-events-none"
+                      className="absolute inset-0 rounded-2xl pointer-events-none"
+                      style={{ backgroundColor: 'rgba(150, 185, 220, 0.05)' }}
                     />
                   )}
                 </div>
@@ -275,7 +291,7 @@ export default function HomePage() {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-24 bg-gradient-to-br from-blue-50 to-white">
+      <section className="py-24" style={{ background: 'linear-gradient(to bottom right, rgba(150, 185, 220, 0.1), white)' }}>
         <div className="container mx-auto px-4 max-w-4xl">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -298,7 +314,7 @@ export default function HomePage() {
                   transition={{ delay: index * 0.1 }}
                   className="text-center p-6"
                 >
-                  <div className="w-14 h-14 rounded-full bg-blue-500 flex items-center justify-center mx-auto mb-4 shadow-lg">
+                  <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg" style={{ backgroundColor: 'rgb(150, 185, 220)' }}>
                     <benefit.icon className="w-7 h-7 text-white" />
                   </div>
                   <h3 className="text-lg font-bold text-gray-900 mb-2">
@@ -315,7 +331,7 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 bg-blue-500">
+      <section className="py-24" style={{ backgroundColor: 'rgb(150, 185, 220)' }}>
         <div className="container mx-auto px-4 max-w-3xl">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -327,13 +343,14 @@ export default function HomePage() {
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
               Prêt à simplifier votre gestion ?
             </h2>
-            <p className="text-lg text-blue-100 mb-8">
+            <p className="text-lg mb-8" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>
               Rejoignez dès aujourd'hui et découvrez comment gagner du temps sur vos tâches administratives.
             </p>
             <Link href="/auth/register">
               <Button 
                 size="lg" 
-                className="text-lg px-8 py-6 h-14 bg-white text-blue-600 hover:bg-gray-100 font-medium shadow-xl hover:shadow-2xl transition-all duration-300 group"
+                className="text-lg px-8 py-6 h-14 bg-white hover:bg-gray-100 font-medium shadow-xl hover:shadow-2xl transition-all duration-300 group"
+                style={{ color: 'rgb(150, 185, 220)' }}
               >
                 Créer mon compte gratuitement
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
