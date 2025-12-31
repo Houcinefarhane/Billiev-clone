@@ -17,7 +17,7 @@ import {
 } from 'lucide-react'
 import { Logo } from '@/components/Logo'
 import { useState } from 'react'
-import Image from 'next/image'
+import { DashboardScreenshot } from '@/components/DashboardScreenshot'
 
 export default function HomePage() {
   const [hoveredFeature, setHoveredFeature] = useState<number | null>(null)
@@ -123,16 +123,9 @@ export default function HomePage() {
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ duration: 0.4 }}
-                      className="w-full h-full relative"
+                      className="w-full h-full relative rounded-lg overflow-hidden"
                     >
-                      <Image
-                        src="/dashboard-screenshot.png"
-                        alt="Aperçu du dashboard ArtisanPro"
-                        fill
-                        className="object-contain rounded-lg"
-                        priority
-                        sizes="(max-width: 1024px) 0vw, 50vw"
-                      />
+                      <DashboardScreenshot />
                     </motion.div>
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-50 to-white">
