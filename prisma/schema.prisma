@@ -67,6 +67,9 @@ model Client {
   invoices      Invoice[]
   quotes        Quote[]
   notifications Notification[]
+  
+  @@index([artisanId])
+  @@index([email])
 }
 
 model Intervention {
@@ -93,6 +96,10 @@ model Intervention {
   
   invoiceId     String?
   invoice       Invoice?  @relation(fields: [invoiceId], references: [id])
+  
+  @@index([artisanId, date])
+  @@index([artisanId, status])
+  @@index([clientId])
 }
 
 model Invoice {
@@ -119,6 +126,10 @@ model Invoice {
   items         InvoiceItem[]
   reminders     InvoiceReminder[]
   expenses      Expense[]
+  
+  @@index([artisanId, date])
+  @@index([artisanId, status])
+  @@index([clientId])
 }
 
 model InvoiceItem {
@@ -154,6 +165,10 @@ model Quote {
   client        Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
   
   items         QuoteItem[]
+  
+  @@index([artisanId, date])
+  @@index([artisanId, status])
+  @@index([clientId])
 }
 
 model QuoteItem {
@@ -183,6 +198,9 @@ model StockItem {
   
   artisanId     String
   artisan       Artisan   @relation(fields: [artisanId], references: [id], onDelete: Cascade)
+  
+  @@index([artisanId])
+  @@index([artisanId, category])
 }
 
 model Expense {
@@ -200,6 +218,9 @@ model Expense {
   
   invoiceId     String?
   invoice       Invoice?  @relation(fields: [invoiceId], references: [id])
+  
+  @@index([artisanId, date])
+  @@index([artisanId, category])
 }
 
 model Notification {

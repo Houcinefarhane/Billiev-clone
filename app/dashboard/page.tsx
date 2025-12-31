@@ -4,12 +4,18 @@ import { useEffect, useState, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { toast } from '@/lib/toast'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Users, Calendar, TrendingUp, Package, AlertCircle, ArrowUpRight, ArrowDownRight, FileText, Clock, CheckCircle2, MapPin, AlertTriangle, Loader } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, Area, AreaChart } from 'recharts'
-import ActivityHeatMap from '@/components/dashboard/ActivityHeatMap'
+
+// Lazy loading pour le HeatMap (composant lourd)
+const ActivityHeatMap = dynamic(() => import('@/components/dashboard/ActivityHeatMap'), {
+  loading: () => <div className="h-64 flex items-center justify-center"><Loader className="w-8 h-8 animate-spin text-primary" /></div>,
+  ssr: false
+})
 
 interface RecentActivity {
   type: 'invoice' | 'intervention' | 'client'

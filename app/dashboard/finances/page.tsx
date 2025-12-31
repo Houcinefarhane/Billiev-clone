@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import dynamic from 'next/dynamic'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -15,8 +16,14 @@ import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, R
 import { exportExpenses, exportInvoices } from '@/lib/export'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
-import { Gauge } from '@/components/ui/gauge'
-import { ObjectivesModal } from '@/components/dashboard/ObjectivesModal'
+
+// Lazy loading pour les composants lourds
+const Gauge = dynamic(() => import('@/components/ui/gauge').then(mod => ({ default: mod.Gauge })), {
+  ssr: false
+})
+const ObjectivesModal = dynamic(() => import('@/components/dashboard/ObjectivesModal').then(mod => ({ default: mod.ObjectivesModal })), {
+  ssr: false
+})
 
 interface Expense {
   id: string
