@@ -4,10 +4,14 @@ import { prisma } from './prisma'
 
 export const authOptions: NextAuthOptions = {
   providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    }),
+    ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+      ? [
+          GoogleProvider({
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+          }),
+        ]
+      : []),
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
@@ -96,46 +100,70 @@ export const authOptions: NextAuthOptions = {
       return `${baseUrl}/dashboard`
     },
     async session({ session, token }) {
-      // Récupérer artisanId depuis le token (déjà stocké dans jwt callback)
-      if (token.artisanId) {
-        ;(session as any).artisanId = token.artisanId
-      }
-      
-      // Si pas dans le token, chercher par email
-      if (!token.artisanId && session.user?.email) {
-        const artisan = await prisma.artisan.findUnique({
-          where: { email: session.user.email },
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            companyName: true,
-            phone: true,
-          },
-        })
-
-        if (artisan) {
-          ;(session as any).artisanId = artisan.id
-          session.user.name = artisan.name
+      try {
+        // Récupérer artisanId depuis le token (déjà stocké dans jwt callback)
+        if (token.artisanId) {
+          ;(session as any).artisanId = token.artisanId
+          return session
         }
+        
+        // Si pas dans le token, chercher par email
+        if (!token.artisanId && session.user?.email) {
+          try {
+            const artisan = await prisma.artisan.findUnique({
+              where: { email: session.user.email.toLowerCase().trim() },
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                companyName: true,
+                phone: true,
+              },
+            })
+
+            if (artisan) {
+              ;(session as any).artisanId = artisan.id
+              session.user.name = artisan.name
+            }
+          } catch (dbError: any) {
+            // En cas d'erreur DB, retourner la session sans artisanId plutôt que de crasher
+            console.error('Erreur DB dans session callback:', dbError?.message)
+            return session
+          }
+        }
+        return session
+      } catch (error: any) {
+        console.error('Erreur dans session callback:', error?.message)
+        // Retourner la session même en cas d'erreur pour éviter de bloquer l'utilisateur
+        return session
       }
-      return session
     },
     async jwt({ token, user, account }) {
-      // Lors de la première connexion OAuth ou si artisanId pas encore dans le token
-      if (user?.email && (!token.artisanId || account?.provider === 'google')) {
-        const artisan = await prisma.artisan.findUnique({
-          where: { email: user.email },
-          select: { id: true },
-        })
-        if (artisan) {
-          token.artisanId = artisan.id
-          console.log('✅ artisanId ajouté au token JWT:', artisan.id)
-        } else {
-          console.warn('⚠️ Artisan non trouvé pour email:', user.email)
+      try {
+        // Lors de la première connexion OAuth ou si artisanId pas encore dans le token
+        if (user?.email && (!token.artisanId || account?.provider === 'google')) {
+          try {
+            const artisan = await prisma.artisan.findUnique({
+              where: { email: user.email.toLowerCase().trim() },
+              select: { id: true },
+            })
+            if (artisan) {
+              token.artisanId = artisan.id
+              console.log('✅ artisanId ajouté au token JWT:', artisan.id)
+            } else {
+              console.warn('⚠️ Artisan non trouvé pour email:', user.email)
+            }
+          } catch (dbError: any) {
+            // En cas d'erreur DB, continuer sans artisanId plutôt que de crasher
+            console.error('Erreur DB dans jwt callback:', dbError?.message)
+          }
         }
+        return token
+      } catch (error: any) {
+        console.error('Erreur dans jwt callback:', error?.message)
+        // Retourner le token même en cas d'erreur
+        return token
       }
-      return token
     },
   },
   pages: {
@@ -146,6 +174,7 @@ export const authOptions: NextAuthOptions = {
     strategy: 'jwt',
     maxAge: 30 * 24 * 60 * 60, // 30 jours
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET || 'fallback-secret-for-development',
+  debug: process.env.NODE_ENV === 'development',
 }
 
