@@ -44,16 +44,27 @@ function LoginContent() {
       })
 
       const data = await res.json()
+      
+      console.log('Login response:', {
+        ok: res.ok,
+        status: res.status,
+        success: data.success,
+        error: data.error,
+        hasCookie: document.cookie.includes('artisanId')
+      })
 
       if (res.ok && data.success) {
         console.log('Connexion réussie, redirection...')
         console.log('Données reçues:', data)
-        // Attendre un peu pour que le cookie soit bien défini
-        await new Promise(resolve => setTimeout(resolve, 200))
+        // Attendre un peu pour que le cookie soit bien défini côté navigateur
+        await new Promise(resolve => setTimeout(resolve, 500))
         // Utiliser window.location pour forcer un rechargement complet et prendre en compte les cookies
         window.location.href = '/dashboard'
+        return // Important : arrêter l'exécution ici
       } else {
         console.error('Erreur de connexion:', data)
+        console.error('Status:', res.status)
+        console.error('Response OK:', res.ok)
         if (data.requiresVerification) {
           setRequiresVerification(true)
           setError(data.error || 'Email non vérifié')

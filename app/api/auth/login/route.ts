@@ -159,10 +159,16 @@ export async function POST(request: Request) {
       sameSite: 'lax' as const,
       maxAge: 60 * 60 * 24 * 7, // 7 jours
       path: '/', // Important : définir le chemin
-      // Ne pas définir de domaine pour permettre tous les sous-domaines Netlify
+      // Ne pas définir de domaine pour permettre tous les sous-domaines Vercel
     }
     
+    // Définir le cookie avec les options
     response.cookies.set('artisanId', artisan.id, cookieOptions)
+    
+    // Vérifier que le cookie est bien défini (logs en développement seulement)
+    if (process.env.NODE_ENV === 'development') {
+      console.log('✅ Cookie artisanId défini:', artisan.id)
+    }
     
     // Ajouter headers rate limit dans la réponse
     response.headers.set('X-RateLimit-Limit', '5')
