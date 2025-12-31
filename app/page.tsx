@@ -27,12 +27,12 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-20 pb-32">
+      <section className="relative overflow-hidden pt-12 pb-16">
         {/* Background gradient - seulement bleu pastel */}
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom right, rgba(150, 185, 220, 0.1), white, rgba(150, 185, 220, 0.1))' }} />
         
         <div className="container mx-auto px-4 relative z-10 max-w-7xl">
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 items-center">
             {/* Left side - Content */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
@@ -44,7 +44,7 @@ export default function HomePage() {
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ delay: 0.2, type: "spring", stiffness: 150, damping: 15 }}
-                className="inline-block mb-8"
+                className="inline-block mb-4"
               >
                 <Logo size="lg" showText={false} className="mx-auto lg:mx-0" />
               </motion.div>
@@ -53,10 +53,10 @@ export default function HomePage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3, duration: 0.6 }}
-                className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 tracking-tight text-gray-900"
+                className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 tracking-tight text-gray-900"
               >
                 Gérez votre activité
-                <span className="block mt-2" style={{ color: 'rgb(150, 185, 220)' }}>
+                <span className="block mt-1" style={{ color: 'rgb(150, 185, 220)' }}>
                   en toute simplicité
                 </span>
               </motion.h1>
@@ -65,7 +65,7 @@ export default function HomePage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4, duration: 0.6 }}
-                className="text-lg md:text-xl text-gray-600 mb-10 leading-relaxed max-w-xl mx-auto lg:mx-0"
+                className="text-lg md:text-xl text-gray-600 mb-6 leading-relaxed max-w-xl mx-auto lg:mx-0"
               >
                 La solution moderne pour organiser vos clients, planifier vos rendez-vous, 
                 gérer vos finances et suivre votre activité en temps réel.
@@ -75,7 +75,7 @@ export default function HomePage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5, duration: 0.6 }}
-                className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
+                className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start"
               >
                 <Link href="/auth/register">
                   <Button 
@@ -158,16 +158,16 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-24 bg-white">
+      <section className="py-12 bg-white">
         <div className="container mx-auto px-4 max-w-5xl">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-16"
+            className="text-center mb-8"
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
               Tout ce dont vous avez besoin
             </h2>
             <p className="text-lg text-gray-600 max-w-xl mx-auto">
@@ -175,7 +175,7 @@ export default function HomePage() {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {features.map((feature, index) => (
               <motion.div
                 key={feature.title}
@@ -189,7 +189,7 @@ export default function HomePage() {
               >
                 <div 
                   className={`
-                    relative h-full p-6 rounded-2xl border-2 transition-all duration-500
+                    relative h-full p-4 rounded-xl border-2 transition-all duration-500
                     ${hoveredFeature === index 
                       ? 'shadow-2xl scale-105' 
                       : 'border-gray-200 bg-white hover:border-gray-300 shadow-lg hover:shadow-xl'
@@ -205,7 +205,7 @@ export default function HomePage() {
                     }}
                     transition={{ duration: 0.3 }}
                     className={`
-                      w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-all duration-500
+                      w-10 h-10 rounded-xl flex items-center justify-center mb-3 transition-all duration-500
                       ${hoveredFeature === index 
                         ? 'text-white shadow-lg' 
                         : 'bg-gray-100 text-gray-700'
@@ -216,15 +216,15 @@ export default function HomePage() {
                       : hoveredFeature === null ? {} : { backgroundColor: 'rgba(150, 185, 220, 0.2)' }
                     }
                   >
-                    <feature.icon className="w-6 h-6" strokeWidth={2} />
+                    <feature.icon className="w-5 h-5" strokeWidth={2} />
                   </motion.div>
 
-                  <h3 className="text-xl font-bold text-gray-900 mb-2 transition-colors"
+                  <h3 className="text-lg font-bold text-gray-900 mb-2 transition-colors"
                       style={hoveredFeature === index ? { color: 'rgb(150, 185, 220)' } : {}}
                   >
                     {feature.title}
                   </h3>
-                  <p className="text-gray-600 leading-relaxed mb-4 text-sm">
+                  <p className="text-gray-600 leading-relaxed mb-3 text-sm">
                     {feature.description}
                   </p>
 
@@ -274,7 +274,7 @@ export default function HomePage() {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-24" style={{ background: 'linear-gradient(to bottom right, rgba(150, 185, 220, 0.1), white)' }}>
+      <section className="py-12" style={{ background: 'linear-gradient(to bottom right, rgba(150, 185, 220, 0.1), white)' }}>
         <div className="container mx-auto px-4 max-w-4xl">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -283,11 +283,11 @@ export default function HomePage() {
             transition={{ duration: 0.6 }}
             className="text-center"
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
               Pourquoi nous choisir ?
             </h2>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {benefits.map((benefit, index) => (
                 <motion.div
                   key={benefit.title}
@@ -295,10 +295,10 @@ export default function HomePage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="text-center p-6"
+                  className="text-center p-4"
                 >
-                  <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg" style={{ backgroundColor: 'rgb(150, 185, 220)' }}>
-                    <benefit.icon className="w-7 h-7 text-white" />
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg" style={{ backgroundColor: 'rgb(150, 185, 220)' }}>
+                    <benefit.icon className="w-6 h-6 text-white" />
                   </div>
                   <h3 className="text-lg font-bold text-gray-900 mb-2">
                     {benefit.title}
@@ -314,7 +314,7 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24" style={{ backgroundColor: 'rgb(150, 185, 220)' }}>
+      <section className="py-12" style={{ backgroundColor: 'rgb(150, 185, 220)' }}>
         <div className="container mx-auto px-4 max-w-3xl">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -323,10 +323,10 @@ export default function HomePage() {
             transition={{ duration: 0.6 }}
             className="text-center"
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
               Prêt à simplifier votre gestion ?
             </h2>
-            <p className="text-lg mb-8" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>
+            <p className="text-lg mb-6" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>
               Rejoignez dès aujourd'hui et découvrez comment gagner du temps sur vos tâches administratives.
             </p>
             <Link href="/auth/register">
@@ -344,16 +344,16 @@ export default function HomePage() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-24 bg-white">
+      <section className="py-12 bg-white">
         <div className="container mx-auto px-4 max-w-4xl">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-16"
+            className="text-center mb-8"
           >
-            <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: 'rgb(150, 185, 220)' }}>
+            <h2 className="text-3xl md:text-4xl font-bold mb-3" style={{ color: 'rgb(150, 185, 220)' }}>
               Questions fréquentes
             </h2>
             <p className="text-lg text-gray-600">
@@ -361,7 +361,7 @@ export default function HomePage() {
             </p>
           </motion.div>
 
-          <div className="space-y-4">
+          <div className="space-y-3">
             {faqData.map((faq, index) => (
               <motion.div
                 key={index}
