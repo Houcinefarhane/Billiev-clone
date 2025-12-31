@@ -31,14 +31,14 @@ export default function HomePage() {
         {/* Background gradient - seulement bleu pastel */}
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom right, rgba(150, 185, 220, 0.1), white, rgba(150, 185, 220, 0.1))' }} />
         
-        <div className="container mx-auto px-4 relative z-10 max-w-6xl">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div className="container mx-auto px-4 relative z-10 max-w-7xl">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 items-center">
             {/* Left side - Content */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
-              className="text-center lg:text-left"
+              className="text-center lg:text-left lg:col-span-2"
             >
               <motion.div
                 initial={{ scale: 0, rotate: -180 }}
@@ -106,9 +106,9 @@ export default function HomePage() {
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.6, duration: 0.8 }}
-              className="relative hidden lg:block"
+              className="relative hidden lg:block lg:col-span-3"
             >
-              <div className="relative w-full aspect-video rounded-2xl overflow-hidden border-2 border-gray-200 shadow-2xl bg-white">
+              <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden border-2 border-gray-200 shadow-2xl bg-white">
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -119,9 +119,9 @@ export default function HomePage() {
                     src="/dashboard-screenshot.png"
                     alt="Aperçu du tableau de bord"
                     fill
-                    className="object-contain"
+                    className="object-cover"
                     priority
-                    sizes="(max-width: 1024px) 0vw, 50vw"
+                    sizes="(max-width: 1024px) 0vw, 60vw"
                   />
                 </motion.div>
               </div>
