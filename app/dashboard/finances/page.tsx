@@ -273,10 +273,6 @@ export default function FinancesPage() {
             <Download className="w-4 h-4 mr-2" />
             PDF
           </Button>
-          <Button variant="outline" onClick={() => setShowObjectiveForm(true)}>
-            <Target className="w-4 h-4 mr-2" />
-            Objectif
-          </Button>
           <Button onClick={() => setShowExpenseForm(true)}>
             <Plus className="w-4 h-4 mr-2" />
             Dépense
