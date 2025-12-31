@@ -18,6 +18,8 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
     const start = searchParams.get('start')
     const end = searchParams.get('end')
+    const page = parseInt(searchParams.get('page') || '1')
+    const limit = parseInt(searchParams.get('limit') || '50')
 
     const where: any = {
       artisanId: artisan.id,
@@ -30,20 +32,31 @@ export async function GET(request: Request) {
       }
     }
 
-    const interventions = await prisma.intervention.findMany({
-      where,
-      include: {
-        client: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            phone: true,
+    // Si start/end fournis (heatmap), pas de pagination
+    // Sinon, pagination par défaut (50 par page)
+    const usePagination = !start || !end
+    
+    const [interventions, total] = await Promise.all([
+      prisma.intervention.findMany({
+        where,
+        include: {
+          client: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              phone: true,
+            },
           },
         },
-      },
-      orderBy: { date: 'asc' },
-    })
+        orderBy: { date: 'desc' },
+        ...(usePagination ? {
+          skip: (page - 1) * limit,
+          take: limit,
+        } : {}),
+      }),
+      usePagination ? prisma.intervention.count({ where }) : Promise.resolve(0)
+    ])
 
     // Sérialiser les dates pour éviter les erreurs de sérialisation
     const serializedInterventions = interventions.map(intervention => ({
@@ -53,6 +66,20 @@ export async function GET(request: Request) {
       updatedAt: intervention.updatedAt.toISOString(),
     }))
 
+    // Si pagination activée, retourner avec métadonnées
+    if (usePagination) {
+      return NextResponse.json({
+        interventions: serializedInterventions,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        }
+      })
+    }
+
+    // Sinon, retour simple pour le heatmap
     return NextResponse.json(serializedInterventions)
   } catch (error) {
     console.error('Error fetching interventions:', error)
