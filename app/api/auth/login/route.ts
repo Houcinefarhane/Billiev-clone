@@ -1,20 +1,15 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { compare } from 'bcryptjs'
+import { rateLimit } from '@/lib/rate-limit'
+import { headers } from 'next/headers'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: Request) {
   try {
-    console.log('=== LOGIN ATTEMPT ===')
-    console.log('NODE_ENV:', process.env.NODE_ENV)
-    console.log('SKIP_EMAIL_VERIFICATION:', process.env.SKIP_EMAIL_VERIFICATION)
-    
     const body = await request.json()
     const { email, password } = body
-
-    console.log('Email reçu:', email ? 'Oui' : 'Non')
-    console.log('Password reçu:', password ? 'Oui' : 'Non')
 
     if (!email || !password) {
       return NextResponse.json(
@@ -23,24 +18,46 @@ export async function POST(request: Request) {
       )
     }
 
-    // Trouver l'artisan
-    console.log('=== RECHERCHE ARTISAN ===')
-    console.log('DATABASE_URL présent:', !!process.env.DATABASE_URL)
-    if (process.env.DATABASE_URL) {
-      try {
-        const urlObj = new URL(process.env.DATABASE_URL)
-        console.log('DATABASE_URL analysé:', {
-          host: urlObj.hostname,
-          port: urlObj.port || '5432 (défaut)',
-          user: urlObj.username,
-          database: urlObj.pathname,
-          hasPassword: !!urlObj.password,
-        })
-      } catch (e) {
-        console.error('Erreur parsing DATABASE_URL:', e)
+    // 🔒 RATE LIMITING : Protection contre brute force
+    // Pourquoi ? Sans ça, un hacker peut essayer 1000 mots de passe/seconde
+    // Avec ça : maximum 5 tentatives toutes les 15 minutes par IP/email
+    const headersList = await headers()
+    const ip = headersList.get('x-forwarded-for') || headersList.get('x-real-ip') || 'unknown'
+    const identifier = `${ip}:${email.toLowerCase().trim()}`
+    
+    const rateLimitResult = rateLimit(identifier, 5, 15 * 60 * 1000) // 5 tentatives / 15 min
+    
+    if (!rateLimitResult.allowed) {
+      const retryAfter = Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000)
+      return NextResponse.json(
+        { 
+          error: 'Trop de tentatives de connexion. Veuillez réessayer dans quelques minutes.',
+          retryAfter 
+        },
+        { 
+          status: 429,
+          headers: {
+            'Retry-After': retryAfter.toString(),
+            'X-RateLimit-Limit': '5',
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': new Date(rateLimitResult.resetTime).toISOString(),
+          }
+        }
+      )
+    }
+
+    if (!email || !password) {
+      return NextResponse.json(
+        { error: 'Email et mot de passe requis' },
+        { status: 400 }
+      )
+    }
+
+    // Vérifier DATABASE_URL (sans logger les détails sensibles)
+    if (!process.env.DATABASE_URL) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error('ERREUR: DATABASE_URL n\'est pas défini!')
       }
-    } else {
-      console.error('ERREUR: DATABASE_URL n\'est pas défini!')
       return NextResponse.json(
         { error: 'Configuration de la base de données manquante. Contactez l\'administrateur.' },
         { status: 500 }
@@ -49,28 +66,13 @@ export async function POST(request: Request) {
     
     let artisan
     try {
-      // Tester la connexion d'abord
-      console.log('Test de connexion à la base de données...')
       await prisma.$connect()
-      console.log('✅ Connexion réussie!')
       
       const emailNormalized = email.toLowerCase().trim()
-      console.log('Email normalisé:', emailNormalized)
       
       artisan = await prisma.artisan.findUnique({
         where: { email: emailNormalized },
       })
-      
-      console.log('Artisan trouvé:', artisan ? `Oui (ID: ${artisan.id}, Email vérifié: ${artisan.emailVerified})` : 'Non')
-      
-      if (!artisan) {
-        // Essayer de trouver tous les emails pour debug
-        const allArtisans = await prisma.artisan.findMany({
-          select: { email: true, emailVerified: true },
-          take: 5,
-        })
-        console.log('Emails dans la base (premiers 5):', allArtisans.map(a => ({ email: a.email, verified: a.emailVerified })))
-      }
     } catch (dbError: any) {
       console.error('=== ERREUR BASE DE DONNÉES ===')
       console.error('Type:', dbError?.constructor?.name)
@@ -111,13 +113,19 @@ export async function POST(request: Request) {
     }
 
     // Vérifier le mot de passe
-    console.log('Vérification du mot de passe...')
     let isValidPassword = false
     try {
-      isValidPassword = await compare(password, artisan.password)
-      console.log('Mot de passe valide:', isValidPassword)
+      if (!artisan.password) {
+        // Compte OAuth sans mot de passe
+        isValidPassword = false
+      } else {
+        isValidPassword = await compare(password, artisan.password)
+      }
     } catch (compareError: any) {
-      console.error('Erreur lors de la comparaison du mot de passe:', compareError?.message)
+      // Ne pas logger l'erreur en production (peut exposer des infos)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Erreur lors de la comparaison du mot de passe:', compareError?.message)
+      }
       isValidPassword = false
     }
 
@@ -128,8 +136,10 @@ export async function POST(request: Request) {
       )
     }
 
-    // Plus besoin de vérifier l'email - tous les comptes sont automatiquement vérifiés
-    console.log('Connexion autorisée pour:', artisan.email)
+    // Connexion autorisée (logs seulement en développement)
+    if (process.env.NODE_ENV === 'development') {
+      console.log('✅ Connexion réussie pour:', artisan.email)
+    }
 
     // Créer un cookie de session (simplifié - dans un vrai projet, utiliser JWT)
     const response = NextResponse.json({
@@ -154,75 +164,44 @@ export async function POST(request: Request) {
     
     response.cookies.set('artisanId', artisan.id, cookieOptions)
     
-    console.log('=== CONNEXION RÉUSSIE ===')
-    console.log('Artisan ID:', artisan.id)
-    console.log('Artisan Email:', artisan.email)
-    console.log('Options du cookie:', cookieOptions)
-    console.log('Cookie défini avec succès')
+    // Ajouter headers rate limit dans la réponse
+    response.headers.set('X-RateLimit-Limit', '5')
+    response.headers.set('X-RateLimit-Remaining', rateLimitResult.remaining.toString())
+    response.headers.set('X-RateLimit-Reset', new Date(rateLimitResult.resetTime).toISOString())
 
     return response
   } catch (error: any) {
-    console.error('=== ERREUR LOGIN ===')
-    console.error('Type:', error?.constructor?.name)
-    console.error('Message:', error?.message)
-    console.error('Stack:', error?.stack)
-    console.error('Name:', error?.name)
-    console.error('Code:', error?.code)
-    
-    // Messages d'erreur détaillés pour aider au diagnostic
-    let errorMessage = 'Erreur lors de la connexion'
-    let errorDetails: any = {}
-    
-    // Vérifier si c'est une erreur Prisma
-    if (error?.code === 'P1001' || error?.message?.includes('Can\'t reach database server')) {
-      console.error('ERREUR: Impossible de se connecter au serveur de base de données')
-      errorMessage = 'Impossible de se connecter à la base de données'
-      errorDetails = {
-        code: 'P1001',
-        suggestion: 'Vérifiez que DATABASE_URL est correctement configuré dans Vercel. Utilisez le pooler Supabase (Transaction mode, port 6543) avec ?pgbouncer=true.',
-      }
-    } else if (error?.code === 'P1000') {
-      console.error('ERREUR: Échec d\'authentification')
-      errorMessage = 'Échec d\'authentification à la base de données'
-      errorDetails = {
-        code: 'P1000',
-        suggestion: 'Vérifiez le mot de passe dans DATABASE_URL. Les caractères spéciaux doivent être URL-encodés (ex: ! devient %21).',
-      }
-    } else if (error?.code === 'P1013' || error?.message?.includes('did not match the expected pattern') || 
-               error?.message?.includes('Invalid connection string')) {
-      console.error('ERREUR: Format DATABASE_URL invalide')
-      errorMessage = 'Format de connexion à la base de données invalide'
-      errorDetails = {
-        code: 'P1013',
-        suggestion: 'Vérifiez le format de DATABASE_URL. Format attendu: postgresql://postgres:[PASSWORD]@db.[PROJECT_REF].supabase.co:5432/postgres',
-      }
-    } else if (error?.message?.includes('DATABASE_URL manquant')) {
-      errorMessage = 'Configuration de la base de données manquante'
-      errorDetails = {
-        suggestion: 'Ajoutez DATABASE_URL dans les variables d\'environnement Vercel (Settings → Environment Variables).',
-      }
-    } else {
-      // Erreur générique - toujours retourner le message pour aider au debug
-      errorMessage = error?.message || 'Erreur lors de la connexion'
-      errorDetails = {
+    // Logs sécurisés : seulement en développement, pas de stack trace en production
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Erreur login:', {
         type: error?.constructor?.name,
+        message: error?.message,
         code: error?.code,
-      }
+      })
+    } else {
+      // En production : logger seulement le type d'erreur, pas les détails
+      console.error('Erreur login:', error?.code || 'UNKNOWN')
     }
     
-    // Logger l'erreur complète pour le debugging
-    console.error('Erreur complète:', JSON.stringify(error, Object.getOwnPropertyNames(error), 2))
+    // Messages d'erreur génériques (ne pas exposer de détails techniques)
+    let errorMessage = 'Erreur lors de la connexion'
     
-    // Retourner un message utile avec suggestions
+    // Messages d'erreur génériques (ne pas exposer de détails techniques en production)
+    if (error?.code === 'P1001' || error?.message?.includes('Can\'t reach database server')) {
+      errorMessage = 'Impossible de se connecter à la base de données'
+    } else if (error?.code === 'P1000') {
+      errorMessage = 'Erreur de configuration de la base de données'
+    } else if (error?.code === 'P1013' || error?.message?.includes('did not match')) {
+      errorMessage = 'Erreur de configuration de la base de données'
+    } else if (error?.message?.includes('DATABASE_URL manquant')) {
+      errorMessage = 'Configuration de la base de données manquante'
+    }
+    
+    // Retourner un message générique (sans détails techniques)
     return NextResponse.json(
-      { 
-        error: errorMessage,
-        ...errorDetails,
-      },
+      { error: errorMessage },
       { status: 500 }
     )
-  } finally {
-    console.log('=== FIN LOGIN ===')
   }
 }
 
