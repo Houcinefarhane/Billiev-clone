@@ -16,7 +16,7 @@ datasource db {
 model Artisan {
   id            String    @id @default(cuid())
   email         String    @unique
-  password      String
+  password      String?   // Optionnel pour OAuth (Google, Apple)
   name          String
   companyName   String?
   phone         String?
