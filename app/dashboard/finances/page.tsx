@@ -362,7 +362,7 @@ export default function FinancesPage() {
               onChange={(e) => setSelectedYear(parseInt(e.target.value))}
               className="px-3 py-2 rounded-md border border-input bg-background text-sm"
             >
-              {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i).map((year) => (
+              {Array.from({ length: 8 }, (_, i) => new Date().getFullYear() + 2 - i).map((year) => (
                 <option key={year} value={year}>
                   {year}
                 </option>
