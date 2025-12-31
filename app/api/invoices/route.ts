@@ -74,6 +74,24 @@ export async function GET(request: Request) {
 
     const totalPages = Math.ceil(total / limit)
 
+    // Calculer les statistiques globales (avec les filtres appliqués)
+    const allInvoicesForStats = await prisma.invoice.findMany({
+      where: whereClause,
+      select: {
+        status: true,
+        total: true,
+      },
+    })
+
+    const stats = {
+      total: allInvoicesForStats.length,
+      sent: allInvoicesForStats.filter(i => i.status === 'sent').length,
+      paid: allInvoicesForStats.filter(i => i.status === 'paid').length,
+      totalAmount: allInvoicesForStats
+        .filter(i => i.status === 'paid')
+        .reduce((sum, i) => sum + i.total, 0),
+    }
+
     // Sérialiser les dates pour éviter les erreurs de sérialisation
     const serializedInvoices = invoices.map(invoice => ({
       ...invoice,
@@ -95,6 +113,7 @@ export async function GET(request: Request) {
         total,
         totalPages,
       },
+      stats,
     })
   } catch (error) {
     console.error('Error fetching invoices:', error)

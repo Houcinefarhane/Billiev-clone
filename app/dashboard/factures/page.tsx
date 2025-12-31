@@ -64,6 +64,12 @@ export default function FacturesPage() {
     total: 0,
     totalPages: 1,
   })
+  const [globalStats, setGlobalStats] = useState({
+    total: 0,
+    sent: 0,
+    paid: 0,
+    totalAmount: 0,
+  })
   const [showForm, setShowForm] = useState(false)
   const [showDetails, setShowDetails] = useState<string | null>(null)
   const [formData, setFormData] = useState({
@@ -98,6 +104,10 @@ export default function FacturesPage() {
           total: 0,
           totalPages: 1,
         })
+        // Mettre à jour les statistiques globales si elles sont fournies par l'API
+        if (data.stats) {
+          setGlobalStats(data.stats)
+        }
       } else {
         console.error('Erreur API factures:', data)
       }
@@ -379,12 +389,12 @@ export default function FacturesPage() {
       {/* Stats Summary */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {[
-          { label: 'Total factures', value: invoices.length, color: 'primary' },
-          { label: 'En attente', value: invoices.filter((i) => i.status === 'sent').length, color: 'accent' },
-          { label: 'Payées', value: invoices.filter((i) => i.status === 'paid').length, color: 'success' },
+          { label: 'Total factures', value: globalStats.total, color: 'primary' },
+          { label: 'En attente', value: globalStats.sent, color: 'accent' },
+          { label: 'Payées', value: globalStats.paid, color: 'success' },
           {
             label: 'Montant total',
-            value: formatCurrency(invoices.reduce((sum, inv) => sum + (inv.status === 'paid' ? inv.total : 0), 0)),
+            value: formatCurrency(globalStats.totalAmount),
             color: 'secondary',
           },
         ].map((stat, index) => (
