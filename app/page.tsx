@@ -14,7 +14,9 @@ import {
   Shield,
   ArrowRight,
   CheckCircle2,
-  ChevronDown
+  ChevronDown,
+  Menu,
+  X
 } from 'lucide-react'
 import { Logo } from '@/components/Logo'
 import { useState } from 'react'
@@ -23,11 +25,130 @@ import Image from 'next/image'
 export default function HomePage() {
   const [hoveredFeature, setHoveredFeature] = useState<number | null>(null)
   const [openFaq, setOpenFaq] = useState<number | null>(null)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id)
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      setMobileMenuOpen(false)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-white">
+      {/* Navigation Bar */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200 shadow-sm">
+        <div className="container mx-auto px-4 max-w-7xl">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo */}
+            <div className="flex items-center">
+              <Logo size="md" showText={false} />
+            </div>
+
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center gap-8">
+              <button
+                onClick={() => scrollToSection('features')}
+                className="text-gray-700 hover:text-gray-900 font-medium transition-colors"
+                style={{ color: 'inherit' }}
+                onMouseEnter={(e) => e.currentTarget.style.color = 'rgb(150, 185, 220)'}
+                onMouseLeave={(e) => e.currentTarget.style.color = ''}
+              >
+                Fonctionnalités
+              </button>
+              <button
+                onClick={() => scrollToSection('benefits')}
+                className="text-gray-700 hover:text-gray-900 font-medium transition-colors"
+                style={{ color: 'inherit' }}
+                onMouseEnter={(e) => e.currentTarget.style.color = 'rgb(150, 185, 220)'}
+                onMouseLeave={(e) => e.currentTarget.style.color = ''}
+              >
+                Avantages
+              </button>
+              <button
+                onClick={() => scrollToSection('faq')}
+                className="text-gray-700 hover:text-gray-900 font-medium transition-colors"
+                style={{ color: 'inherit' }}
+                onMouseEnter={(e) => e.currentTarget.style.color = 'rgb(150, 185, 220)'}
+                onMouseLeave={(e) => e.currentTarget.style.color = ''}
+              >
+                FAQ
+              </button>
+              <Link href="/auth/login">
+                <Button variant="ghost" className="text-gray-700 hover:text-gray-900">
+                  Se connecter
+                </Button>
+              </Link>
+              <Link href="/auth/register">
+                <Button 
+                  className="text-white font-medium"
+                  style={{ backgroundColor: 'rgb(150, 185, 220)' }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgb(130, 165, 200)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgb(150, 185, 220)'}
+                >
+                  Commencer
+                </Button>
+              </Link>
+            </div>
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2 text-gray-700"
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
+
+          {/* Mobile Menu */}
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="md:hidden border-t border-gray-200 py-4 space-y-3"
+            >
+              <button
+                onClick={() => scrollToSection('features')}
+                className="block w-full text-left px-4 py-2 text-gray-700 hover:text-gray-900 font-medium transition-colors"
+              >
+                Fonctionnalités
+              </button>
+              <button
+                onClick={() => scrollToSection('benefits')}
+                className="block w-full text-left px-4 py-2 text-gray-700 hover:text-gray-900 font-medium transition-colors"
+              >
+                Avantages
+              </button>
+              <button
+                onClick={() => scrollToSection('faq')}
+                className="block w-full text-left px-4 py-2 text-gray-700 hover:text-gray-900 font-medium transition-colors"
+              >
+                FAQ
+              </button>
+              <div className="px-4 pt-2 space-y-2 border-t border-gray-200 mt-2">
+                <Link href="/auth/login" className="block">
+                  <Button variant="outline" className="w-full">
+                    Se connecter
+                  </Button>
+                </Link>
+                <Link href="/auth/register" className="block">
+                  <Button 
+                    className="w-full text-white"
+                    style={{ backgroundColor: 'rgb(150, 185, 220)' }}
+                  >
+                    Commencer
+                  </Button>
+                </Link>
+              </div>
+            </motion.div>
+          )}
+        </div>
+      </nav>
+
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-12 pb-16">
+      <section className="relative overflow-hidden pt-28 pb-16">
         {/* Background gradient - seulement bleu pastel */}
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom right, rgba(150, 185, 220, 0.1), white, rgba(150, 185, 220, 0.1))' }} />
         
@@ -158,7 +279,7 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-12 bg-white">
+      <section id="features" className="py-12 bg-white scroll-mt-16">
         <div className="container mx-auto px-4 max-w-5xl">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -274,7 +395,7 @@ export default function HomePage() {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-12" style={{ background: 'linear-gradient(to bottom right, rgba(150, 185, 220, 0.1), white)' }}>
+      <section id="benefits" className="py-12 scroll-mt-16" style={{ background: 'linear-gradient(to bottom right, rgba(150, 185, 220, 0.1), white)' }}>
         <div className="container mx-auto px-4 max-w-4xl">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -344,7 +465,7 @@ export default function HomePage() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-12 bg-white">
+      <section id="faq" className="py-12 bg-white scroll-mt-16">
         <div className="container mx-auto px-4 max-w-4xl">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
