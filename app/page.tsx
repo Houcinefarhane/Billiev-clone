@@ -108,7 +108,7 @@ export default function HomePage() {
               transition={{ delay: 0.6, duration: 0.8 }}
               className="relative hidden lg:block lg:col-span-3"
             >
-              <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden border-2 border-gray-200 shadow-2xl bg-white">
+              <div className="relative w-full aspect-video rounded-2xl overflow-hidden border-2 border-gray-200 shadow-2xl bg-white">
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -119,7 +119,7 @@ export default function HomePage() {
                     src="/dashboard-screenshot.png"
                     alt="Aperçu du tableau de bord"
                     fill
-                    className="object-cover"
+                    className="object-contain"
                     priority
                     sizes="(max-width: 1024px) 0vw, 60vw"
                   />
