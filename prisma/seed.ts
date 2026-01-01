@@ -202,8 +202,7 @@ async function main() {
   const interventions = []
   const startDate = new Date()
   startDate.setMonth(startDate.getMonth() - 12) // 12 mois en arrière
-  const endDate = new Date()
-  endDate.setMonth(endDate.getMonth() + 3) // 3 mois dans le futur
+  const endDate = new Date('2026-12-31') // Jusqu'à fin 2026
   
   // Créer des maps pour suivre les interventions par jour
   const interventionsByDay = new Map<string, number>()
