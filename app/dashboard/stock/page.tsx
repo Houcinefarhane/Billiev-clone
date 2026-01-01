@@ -21,23 +21,23 @@ interface StockItem {
   supplier: string | null
 }
 
-// Catégories prédéfinies pour les artisans
+// Catégories génériques pour tous types d'entreprises
 const STOCK_CATEGORIES = [
-  'Vis',
-  'Boulons',
-  'Clés',
-  'Écrous',
-  'Rondelles',
-  'Tuyaux',
-  'Raccords',
-  'Colliers',
-  'Joint',
-  'Robinet',
-  'Vanne',
-  'Serrure',
-  'Cylindre',
-  'Gond',
-  'Pêne',
+  'Matériel',
+  'Fournitures',
+  'Outillage',
+  'Équipement',
+  'Consommables',
+  'Pièces détachées',
+  'Accessoires',
+  'Produits finis',
+  'Matières premières',
+  'Emballage',
+  'Informatique',
+  'Bureau',
+  'Maintenance',
+  'Sécurité',
+  'Nettoyage',
   'Autre',
 ]
 
