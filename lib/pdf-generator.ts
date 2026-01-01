@@ -36,6 +36,17 @@ interface InvoiceData {
   tax: number
   total: number
   notes: string | null
+  customization?: {
+    logoUrl: string | null
+    showLogo: boolean
+    primaryColorR: number
+    primaryColorG: number
+    primaryColorB: number
+    footerText: string | null
+    headerText: string | null
+    showLegalInfo: boolean
+    showCompanyInfo: boolean
+  }
 }
 
 export function generateInvoicePDF(invoice: InvoiceData): void {
@@ -58,23 +69,35 @@ export function generateInvoicePDF(invoice: InvoiceData): void {
     return `${formattedInteger},${decimalPart} €`
   }
 
-  // Couleurs
-  const primaryColor = [150, 185, 220] // Bleu pastel plus bleuté
+  // Couleurs personnalisées ou par défaut
+  const customization = invoice.customization
+  const primaryColor = customization
+    ? [customization.primaryColorR, customization.primaryColorG, customization.primaryColorB]
+    : [150, 185, 220] // Bleu pastel par défaut
   const creamColor = [253, 244, 220] // Crème
   const darkColor = [10, 10, 10] // Noir
   const textColor = [38, 38, 38] // Gris foncé
 
   // En-tête avec logo
-  doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2])
-  doc.roundedRect(margin, yPos, 30, 30, 3, 3, 'F')
-  
-  // Icône Wrench (simplifiée - dessin manuel)
-  doc.setLineWidth(2)
-  doc.setDrawColor(0, 0, 0)
-  // Dessiner un W stylisé
-  doc.line(margin + 10, yPos + 10, margin + 15, yPos + 20)
-  doc.line(margin + 15, yPos + 20, margin + 20, yPos + 10)
-  doc.line(margin + 20, yPos + 10, margin + 20, yPos + 20)
+  if (customization?.showLogo && customization?.logoUrl) {
+    // Si un logo est fourni, on essaie de l'ajouter (nécessite une conversion base64 -> image)
+    // Pour l'instant, on garde le rectangle coloré
+    doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2])
+    doc.roundedRect(margin, yPos, 30, 30, 3, 3, 'F')
+    // TODO: Ajouter le logo si c'est une URL valide
+  } else if (!customization || customization.showLogo) {
+    // Logo par défaut (icône)
+    doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2])
+    doc.roundedRect(margin, yPos, 30, 30, 3, 3, 'F')
+    
+    // Icône Wrench (simplifiée - dessin manuel)
+    doc.setLineWidth(2)
+    doc.setDrawColor(0, 0, 0)
+    // Dessiner un W stylisé
+    doc.line(margin + 10, yPos + 10, margin + 15, yPos + 20)
+    doc.line(margin + 15, yPos + 20, margin + 20, yPos + 10)
+    doc.line(margin + 20, yPos + 10, margin + 20, yPos + 20)
+  }
   
   // Nom de l'entreprise
   const companyName = invoice.artisan?.companyName || invoice.artisan?.name || 'ArtisanPro'
@@ -83,26 +106,36 @@ export function generateInvoicePDF(invoice: InvoiceData): void {
   doc.setTextColor(darkColor[0], darkColor[1], darkColor[2])
   doc.text(companyName, margin + 40, yPos + 12)
   
-  // Informations de l'entreprise
-  doc.setFontSize(9)
-  doc.setFont('helvetica', 'normal')
-  doc.setTextColor(100, 100, 100)
-  let companyInfoY = yPos + 20
+  // Informations de l'entreprise (si activées)
+  if (!customization || customization.showCompanyInfo) {
+    doc.setFontSize(9)
+    doc.setFont('helvetica', 'normal')
+    doc.setTextColor(100, 100, 100)
+    let companyInfoY = yPos + 20
+    
+    if (invoice.artisan?.address) {
+      doc.text(invoice.artisan.address, margin + 40, companyInfoY)
+      companyInfoY += 5
+    }
+    if (invoice.artisan?.phone) {
+      doc.text(`Tél: ${invoice.artisan.phone}`, margin + 40, companyInfoY)
+      companyInfoY += 5
+    }
+    if ((!customization || customization.showLegalInfo) && invoice.artisan?.siret) {
+      doc.text(`SIRET: ${invoice.artisan.siret}`, margin + 40, companyInfoY)
+      companyInfoY += 5
+    }
+    if ((!customization || customization.showLegalInfo) && invoice.artisan?.vatNumber) {
+      doc.text(`TVA: ${invoice.artisan.vatNumber}`, margin + 40, companyInfoY)
+    }
+  }
   
-  if (invoice.artisan?.address) {
-    doc.text(invoice.artisan.address, margin + 40, companyInfoY)
-    companyInfoY += 5
-  }
-  if (invoice.artisan?.phone) {
-    doc.text(`Tél: ${invoice.artisan.phone}`, margin + 40, companyInfoY)
-    companyInfoY += 5
-  }
-  if (invoice.artisan?.siret) {
-    doc.text(`SIRET: ${invoice.artisan.siret}`, margin + 40, companyInfoY)
-    companyInfoY += 5
-  }
-  if (invoice.artisan?.vatNumber) {
-    doc.text(`TVA: ${invoice.artisan.vatNumber}`, margin + 40, companyInfoY)
+  // Texte d'en-tête personnalisé
+  if (customization?.headerText) {
+    doc.setFontSize(10)
+    doc.setFont('helvetica', 'italic')
+    doc.setTextColor(100, 100, 100)
+    doc.text(customization.headerText, pageWidth / 2, yPos + 35, { align: 'center' })
   }
   
   // Titre FACTURE
@@ -235,33 +268,37 @@ export function generateInvoicePDF(invoice: InvoiceData): void {
   doc.setFontSize(7)
   doc.setTextColor(120, 120, 120)
   
-  // Informations légales
-  const legalInfo: string[] = []
-  if (invoice.artisan?.siret) {
-    legalInfo.push(`SIRET: ${invoice.artisan.siret}`)
-  }
-  if (invoice.artisan?.siren) {
-    legalInfo.push(`SIREN: ${invoice.artisan.siren}`)
-  }
-  if (invoice.artisan?.rcs) {
-    legalInfo.push(`RCS: ${invoice.artisan.rcs}`)
-  }
-  if (invoice.artisan?.kbis) {
-    legalInfo.push(`KBIS: ${invoice.artisan.kbis}`)
-  }
-  if (invoice.artisan?.capital) {
-    legalInfo.push(`Capital: ${invoice.artisan.capital}`)
-  }
-  if (invoice.artisan?.legalAddress) {
-    legalInfo.push(`Siège social: ${invoice.artisan.legalAddress}`)
+  // Informations légales (si activées)
+  if (!customization || customization.showLegalInfo) {
+    const legalInfo: string[] = []
+    if (invoice.artisan?.siret) {
+      legalInfo.push(`SIRET: ${invoice.artisan.siret}`)
+    }
+    if (invoice.artisan?.siren) {
+      legalInfo.push(`SIREN: ${invoice.artisan.siren}`)
+    }
+    if (invoice.artisan?.rcs) {
+      legalInfo.push(`RCS: ${invoice.artisan.rcs}`)
+    }
+    if (invoice.artisan?.kbis) {
+      legalInfo.push(`KBIS: ${invoice.artisan.kbis}`)
+    }
+    if (invoice.artisan?.capital) {
+      legalInfo.push(`Capital: ${invoice.artisan.capital}`)
+    }
+    if (invoice.artisan?.legalAddress) {
+      legalInfo.push(`Siège social: ${invoice.artisan.legalAddress}`)
+    }
+    
+    if (legalInfo.length > 0) {
+      doc.text(legalInfo.join(' | '), pageWidth / 2, footerY, { align: 'center', maxWidth: pageWidth - 2 * margin })
+      footerY += 5
+    }
   }
   
-  if (legalInfo.length > 0) {
-    doc.text(legalInfo.join(' | '), pageWidth / 2, footerY, { align: 'center', maxWidth: pageWidth - 2 * margin })
-    footerY += 5
-  }
-  
-  doc.text('Merci de votre confiance !', pageWidth / 2, footerY + 5, { align: 'center' })
+  // Texte de pied de page personnalisé
+  const footerText = customization?.footerText || 'Merci de votre confiance !'
+  doc.text(footerText, pageWidth / 2, footerY + 5, { align: 'center' })
 
   // Télécharger le PDF
   doc.save(`facture-${invoice.invoiceNumber}.pdf`)

@@ -40,17 +40,36 @@ async function main() {
 
   console.log(`✅ Artisan trouvé: ${artisan.email}`)
 
-  // Récupérer les clients existants
-  const clients = await prisma.client.findMany({
+  // Récupérer les clients existants ou en créer
+  let clients = await prisma.client.findMany({
     where: { artisanId: artisan.id },
   })
 
   if (clients.length === 0) {
-    console.log('❌ Aucun client trouvé. Veuillez d\'abord créer des clients.')
-    return
+    console.log('📝 Aucun client trouvé. Création de 10 clients...')
+    const firstNames = ['Jean', 'Marie', 'Pierre', 'Sophie', 'Michel', 'Isabelle', 'Philippe', 'Catherine', 'Alain', 'Françoise']
+    const lastNames = ['Martin', 'Bernard', 'Dubois', 'Thomas', 'Robert', 'Richard', 'Petit', 'Durand', 'Leroy', 'Moreau']
+    const cities = ['Paris', 'Lyon', 'Marseille', 'Toulouse', 'Nice', 'Nantes', 'Strasbourg', 'Montpellier', 'Bordeaux', 'Lille']
+    
+    for (let i = 0; i < 10; i++) {
+      const client = await prisma.client.create({
+        data: {
+          firstName: firstNames[i],
+          lastName: lastNames[i],
+          email: `${firstNames[i].toLowerCase()}.${lastNames[i].toLowerCase()}@example.com`,
+          phone: `0${randomInt(100000000, 999999999)}`,
+          address: `${randomInt(1, 200)} Rue de Test`,
+          city: cities[i],
+          postalCode: `${randomInt(10000, 99999)}`,
+          artisanId: artisan.id,
+        },
+      })
+      clients.push(client)
+    }
+    console.log(`✅ ${clients.length} clients créés`)
+  } else {
+    console.log(`✅ ${clients.length} clients trouvés`)
   }
-
-  console.log(`✅ ${clients.length} clients trouvés`)
 
   // Dates pour 2026
   const startDate2026 = new Date('2026-01-01')

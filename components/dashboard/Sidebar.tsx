@@ -17,6 +17,7 @@ import {
   X,
   MapPin,
   Bell,
+  Settings,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useState, useEffect } from 'react'
@@ -35,6 +36,7 @@ const menuItems = [
   { href: '/dashboard/finances', label: 'Finances', icon: TrendingUp },
   { href: '/dashboard/stock', label: 'Stock', icon: Package },
   { href: '/dashboard/notifications', label: 'Notifications', icon: Bell },
+  { href: '/dashboard/parametres-factures', label: 'Paramètres factures', icon: Settings },
 ]
 
 export function Sidebar() {

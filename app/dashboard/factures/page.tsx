@@ -242,18 +242,27 @@ export default function FacturesPage() {
     const invoice = invoices.find((inv) => inv.id === id)
     if (invoice) {
       try {
-        // Récupérer les informations de l'artisan
-        const artisanRes = await fetch('/api/artisan')
+        // Récupérer les informations de l'artisan et la personnalisation
+        const [artisanRes, customizationRes] = await Promise.all([
+          fetch('/api/artisan'),
+          fetch('/api/invoice-customization'),
+        ])
+        
+        let artisan = null
+        let customization = null
+        
         if (artisanRes.ok) {
-          const artisan = await artisanRes.json()
-          generateInvoicePDF({ ...invoice, artisan })
-        } else {
-          // Si erreur, générer quand même le PDF sans les infos artisan
-          generateInvoicePDF(invoice)
+          artisan = await artisanRes.json()
         }
+        
+        if (customizationRes.ok) {
+          customization = await customizationRes.json()
+        }
+        
+        generateInvoicePDF({ ...invoice, artisan, customization })
       } catch (error) {
-        console.error('Error fetching artisan info:', error)
-        // Générer quand même le PDF sans les infos artisan
+        console.error('Error fetching info:', error)
+        // Générer quand même le PDF sans les infos
         generateInvoicePDF(invoice)
       }
     }

@@ -45,6 +45,7 @@ model Artisan {
   notifications Notification[]
   invoiceReminders InvoiceReminder[]
   financialObjectives FinancialObjective[]
+  invoiceCustomization InvoiceCustomization?
 }
 
 model Client {
@@ -291,5 +292,31 @@ model KeyResult {
   
   objectiveId   String
   objective     FinancialObjective @relation(fields: [objectiveId], references: [id], onDelete: Cascade)
+}
+
+model InvoiceCustomization {
+  id            String    @id @default(cuid())
+  artisanId     String    @unique
+  artisan       Artisan   @relation(fields: [artisanId], references: [id], onDelete: Cascade)
+  
+  // Logo
+  logoUrl       String?   // URL du logo (stocké dans /public/logos ou cloud)
+  showLogo      Boolean   @default(true)
+  
+  // Couleurs (RGB)
+  primaryColorR Int       @default(150)
+  primaryColorG Int       @default(185)
+  primaryColorB Int       @default(220)
+  
+  // Textes personnalisés
+  footerText    String?   // Texte en bas de page (ex: "Merci de votre confiance !")
+  headerText    String?   // Texte personnalisé en haut si besoin
+  
+  // Options d'affichage
+  showLegalInfo Boolean   @default(true) // Afficher SIRET, SIREN, etc.
+  showCompanyInfo Boolean @default(true) // Afficher adresse, téléphone entreprise
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
 
