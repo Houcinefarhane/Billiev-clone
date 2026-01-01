@@ -159,7 +159,7 @@ export default function DepensesPage() {
   const resetForm = () => {
     setFormData({
       description: '',
-      category: 'matériel',
+      category: 'Matériel',
       amount: '',
       date: new Date().toISOString().split('T')[0],
       receipt: '',
