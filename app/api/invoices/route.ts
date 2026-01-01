@@ -83,13 +83,22 @@ export async function GET(request: Request) {
       },
     })
 
+    // Calculer le montant total de TOUTES les factures correspondant aux filtres
+    const totalAmountAll = allInvoicesForStats.reduce((sum, i) => sum + i.total, 0)
+    
+    // Calculer le montant total des factures payées (pour l'affichage général)
+    const totalAmountPaid = allInvoicesForStats
+      .filter(i => i.status === 'paid')
+      .reduce((sum, i) => sum + i.total, 0)
+
     const stats = {
       total: allInvoicesForStats.length,
       sent: allInvoicesForStats.filter(i => i.status === 'sent').length,
       paid: allInvoicesForStats.filter(i => i.status === 'paid').length,
-      totalAmount: allInvoicesForStats
-        .filter(i => i.status === 'paid')
-        .reduce((sum, i) => sum + i.total, 0),
+      // Montant total de toutes les factures filtrées (pas seulement payées)
+      totalAmount: totalAmountAll,
+      // Montant total des factures payées (pour référence)
+      totalAmountPaid: totalAmountPaid,
     }
 
     // Sérialiser les dates pour éviter les erreurs de sérialisation
