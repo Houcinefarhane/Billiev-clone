@@ -108,33 +108,39 @@ export default function DevisPage() {
     }
   }
 
-  useEffect(() => {
-    fetchQuotes(currentPage, searchTerm, statusFilter)
-    fetchClients()
-    // Corriger automatiquement les totaux au chargement
-    fixQuoteTotals()
-  }, [currentPage, searchTerm, statusFilter])
-
-  const fixQuoteTotals = async () => {
+  const fixQuoteTotals = useCallback(async () => {
     try {
-      console.log('🔧 Correction automatique des totaux des devis...')
+      console.log('🔧 [FIX] Correction automatique des totaux des devis...')
       const res = await fetch('/api/quotes/fix-totals', { method: 'POST' })
       const data = await res.json()
+      console.log('🔧 [FIX] Réponse API:', data)
       if (res.ok) {
         if (data.itemsCorrected > 0 || data.quotesCorrected > 0) {
-          console.log('✅ Totaux corrigés:', data.message)
+          console.log('✅ [FIX] Totaux corrigés:', data.message)
           // Recharger les devis après correction
           await fetchQuotes(currentPage, searchTerm, statusFilter)
         } else {
-          console.log('ℹ️ Aucun total à corriger, tout est déjà correct')
+          console.log('ℹ️ [FIX] Aucun total à corriger, tout est déjà correct')
         }
       } else {
-        console.error('❌ Erreur lors de la correction:', data.error)
+        console.error('❌ [FIX] Erreur lors de la correction:', data.error)
       }
     } catch (error) {
-      console.error('❌ Error fixing quote totals:', error)
+      console.error('❌ [FIX] Error fixing quote totals:', error)
     }
-  }
+  }, [currentPage, searchTerm, statusFilter])
+
+  // Charger les devis et clients
+  useEffect(() => {
+    fetchQuotes(currentPage, searchTerm, statusFilter)
+    fetchClients()
+  }, [currentPage, searchTerm, statusFilter])
+
+  // Corriger les totaux une seule fois au montage du composant
+  useEffect(() => {
+    console.log('🔧 [FIX] useEffect déclenché, correction des totaux...')
+    fixQuoteTotals()
+  }, []) // Exécuté une seule fois au montage
 
   const calculateTotals = (items: QuoteItem[], taxRate: number) => {
     const subtotal = items.reduce((sum, item) => {
