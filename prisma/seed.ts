@@ -170,6 +170,11 @@ async function main() {
 
   // Générer des items de stock (20)
   console.log('Création de 20 items de stock...')
+  const stockCategories = [
+    'Matériel', 'Fournitures', 'Outillage', 'Équipement', 'Consommables',
+    'Pièces détachées', 'Accessoires', 'Produits finis', 'Matières premières',
+    'Emballage', 'Informatique', 'Bureau', 'Maintenance', 'Sécurité', 'Nettoyage', 'Autre'
+  ]
   const stockItems = []
   for (let i = 0; i < 20; i++) {
     const material = randomElement(materials)
@@ -177,6 +182,7 @@ async function main() {
       data: {
         name: material,
         description: `Description pour ${material}`,
+        category: randomElement(stockCategories),
         quantity: randomInt(0, 500),
         unit: randomElement(['unité', 'mètre', 'kg', 'litre', 'paquet']),
         unitPrice: randomFloat(5, 200),
