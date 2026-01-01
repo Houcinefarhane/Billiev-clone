@@ -65,28 +65,28 @@ export async function POST(request: Request) {
       artisan = await prisma.artisan.findUnique({
         where: { email: emailNormalized },
       })
-           } catch (dbError: any) {
-             logger.error('Erreur base de données', { code: dbError?.code })
-             
-             // Vérifier le type d'erreur Prisma
-             if (dbError?.code === 'P1001') {
-               throw new Error('Impossible de se connecter à la base de données. Vérifiez votre configuration DATABASE_URL dans Vercel.')
-             }
-             
-             if (dbError?.code === 'P1000') {
-               throw new Error('Échec d\'authentification à la base de données. Vérifiez le mot de passe dans DATABASE_URL.')
-             }
-             
-             // Vérifier si c'est une erreur de format DATABASE_URL
-             if (dbError?.message?.includes('did not match the expected pattern') || 
-                 dbError?.message?.includes('Invalid connection string') ||
-                 dbError?.code === 'P1013') {
-               throw new Error('Format de connexion à la base de données invalide. Vérifiez votre DATABASE_URL dans Vercel.')
-             }
-             
-             // Erreur générique
-             throw new Error(`Erreur de connexion à la base de données: ${dbError?.message || 'Erreur inconnue'} (Code: ${dbError?.code || 'N/A'})`)
-           }
+    } catch (dbError: any) {
+      logger.error('Erreur base de données', { code: dbError?.code })
+      
+      // Vérifier le type d'erreur Prisma
+      if (dbError?.code === 'P1001') {
+        throw new Error('Impossible de se connecter à la base de données. Vérifiez votre configuration DATABASE_URL dans Vercel.')
+      }
+      
+      if (dbError?.code === 'P1000') {
+        throw new Error('Échec d\'authentification à la base de données. Vérifiez le mot de passe dans DATABASE_URL.')
+      }
+      
+      // Vérifier si c'est une erreur de format DATABASE_URL
+      if (dbError?.message?.includes('did not match the expected pattern') || 
+          dbError?.message?.includes('Invalid connection string') ||
+          dbError?.code === 'P1013') {
+        throw new Error('Format de connexion à la base de données invalide. Vérifiez votre DATABASE_URL dans Vercel.')
+      }
+      
+      // Erreur générique
+      throw new Error(`Erreur de connexion à la base de données: ${dbError?.message || 'Erreur inconnue'} (Code: ${dbError?.code || 'N/A'})`)
+    }
 
     if (!artisan) {
       return NextResponse.json(
@@ -119,8 +119,8 @@ export async function POST(request: Request) {
       )
     }
 
-           // Connexion autorisée
-           logger.info('Connexion réussie')
+    // Connexion autorisée
+    logger.info('Connexion réussie')
 
     // Créer un cookie de session (simplifié - dans un vrai projet, utiliser JWT)
     const response = NextResponse.json({
@@ -144,7 +144,7 @@ export async function POST(request: Request) {
       path: '/',
     })
     
-           // Cookie défini avec succès
+    // Cookie défini avec succès
     
     // Ajouter headers rate limit dans la réponse
     response.headers.set('X-RateLimit-Limit', '5')
@@ -152,8 +152,8 @@ export async function POST(request: Request) {
     response.headers.set('X-RateLimit-Reset', new Date(rateLimitResult.resetTime).toISOString())
 
     return response
-         } catch (error: any) {
-           logger.error('Erreur login', { code: error?.code })
+  } catch (error: any) {
+    logger.error('Erreur login', { code: error?.code })
     
     // Messages d'erreur génériques (ne pas exposer de détails techniques)
     let errorMessage = 'Erreur lors de la connexion'
