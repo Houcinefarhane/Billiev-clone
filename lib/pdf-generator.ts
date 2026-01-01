@@ -138,6 +138,23 @@ export function generateInvoicePDF(invoice: InvoiceData): void {
     doc.text(customization.headerText, pageWidth / 2, yPos + 35, { align: 'center' })
   }
   
+  // Champs personnalisés dans l'en-tête
+  if (customization?.customFields) {
+    const headerFields = customization.customFields.filter((f: any) => f.position === 'header')
+    if (headerFields.length > 0) {
+      let headerFieldsY = yPos + 45
+      doc.setFontSize(9)
+      doc.setFont('helvetica', 'normal')
+      doc.setTextColor(80, 80, 80)
+      headerFields.forEach((field: any) => {
+        if (field.label && field.value) {
+          doc.text(`${field.label}: ${field.value}`, pageWidth / 2, headerFieldsY, { align: 'center' })
+          headerFieldsY += 5
+        }
+      })
+    }
+  }
+  
   // Titre FACTURE
   doc.setFontSize(24)
   doc.setFont('helvetica', 'bold')
@@ -169,6 +186,23 @@ export function generateInvoicePDF(invoice: InvoiceData): void {
   doc.text(invoice.client.phone, margin, yPos + 21)
   if (invoice.client.address) {
     doc.text(invoice.client.address, margin, yPos + 28)
+  }
+  
+  // Champs personnalisés dans la section client
+  if (customization?.customFields) {
+    const clientFields = customization.customFields.filter((f: any) => f.position === 'client')
+    if (clientFields.length > 0) {
+      let clientFieldsY = yPos + 35
+      doc.setFontSize(9)
+      doc.setFont('helvetica', 'normal')
+      doc.setTextColor(80, 80, 80)
+      clientFields.forEach((field: any) => {
+        if (field.label && field.value) {
+          doc.text(`${field.label}: ${field.value}`, margin, clientFieldsY)
+          clientFieldsY += 5
+        }
+      })
+    }
   }
 
   // Informations facture (droite)
@@ -299,6 +333,23 @@ export function generateInvoicePDF(invoice: InvoiceData): void {
   // Texte de pied de page personnalisé
   const footerText = customization?.footerText || 'Merci de votre confiance !'
   doc.text(footerText, pageWidth / 2, footerY + 5, { align: 'center' })
+  
+  // Champs personnalisés dans le pied de page
+  if (customization?.customFields) {
+    const footerFields = customization.customFields.filter((f: any) => f.position === 'footer')
+    if (footerFields.length > 0) {
+      let footerFieldsY = footerY + 12
+      doc.setFontSize(8)
+      doc.setFont('helvetica', 'normal')
+      doc.setTextColor(100, 100, 100)
+      footerFields.forEach((field: any) => {
+        if (field.label && field.value) {
+          doc.text(`${field.label}: ${field.value}`, pageWidth / 2, footerFieldsY, { align: 'center' })
+          footerFieldsY += 4
+        }
+      })
+    }
+  }
 
   // Télécharger le PDF
   doc.save(`facture-${invoice.invoiceNumber}.pdf`)

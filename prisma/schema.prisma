@@ -316,6 +316,9 @@ model InvoiceCustomization {
   showLegalInfo Boolean   @default(true) // Afficher SIRET, SIREN, etc.
   showCompanyInfo Boolean @default(true) // Afficher adresse, téléphone entreprise
   
+  // Champs personnalisés (JSON array: [{label: string, value: string, position: 'header' | 'footer' | 'client'}])
+  customFields  Json?     // Champs personnalisés à afficher sur les factures
+  
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }

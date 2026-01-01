@@ -68,6 +68,7 @@ export async function PUT(request: Request) {
       headerText,
       showLegalInfo,
       showCompanyInfo,
+      customFields,
     } = body
 
     // Mettre à jour ou créer la personnalisation
@@ -83,6 +84,7 @@ export async function PUT(request: Request) {
         headerText: headerText !== undefined ? headerText : null,
         showLegalInfo: showLegalInfo !== undefined ? showLegalInfo : true,
         showCompanyInfo: showCompanyInfo !== undefined ? showCompanyInfo : true,
+        customFields: customFields !== undefined ? customFields : null,
       },
       create: {
         artisanId: artisan.id,
@@ -95,6 +97,7 @@ export async function PUT(request: Request) {
         headerText: headerText || null,
         showLegalInfo: showLegalInfo !== undefined ? showLegalInfo : true,
         showCompanyInfo: showCompanyInfo !== undefined ? showCompanyInfo : true,
+        customFields: customFields || null,
       },
     })
 
