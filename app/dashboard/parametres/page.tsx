@@ -26,22 +26,7 @@ export default function ParametresPage() {
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
   const [isOAuthOnly, setIsOAuthOnly] = useState(false)
 
-  // Vérifier si le compte est OAuth uniquement
-  useEffect(() => {
-    const checkAccountType = async () => {
-      try {
-        const res = await fetch('/api/artisan')
-        if (res.ok) {
-          const artisan = await res.json()
-          // Si pas de mot de passe, c'est OAuth uniquement
-          // On ne peut pas vraiment vérifier ça côté client, mais on peut essayer
-        }
-      } catch (error) {
-        console.error('Error checking account type:', error)
-      }
-    }
-    checkAccountType()
-  }, [])
+  // Note: La vérification OAuth se fait côté serveur lors de la tentative de changement
 
   // Valider la force du mot de passe en temps réel
   useEffect(() => {
