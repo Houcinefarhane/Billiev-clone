@@ -521,6 +521,18 @@ export default function FacturesPage() {
                         >
                           <Download className="w-4 h-4" />
                         </Button>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleDeleteInvoice(invoice.id)
+                          }}
+                          title="Supprimer la facture"
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                       </div>
                     </div>
                   </div>
