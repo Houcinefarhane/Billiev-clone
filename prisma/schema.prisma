@@ -14,7 +14,7 @@ datasource db {
 }
 
 model Artisan {
-  id            String    @id @default(cuid())
+  id            String    @id // UUID de Supabase Auth ou cuid() pour anciens utilisateurs
   email         String    @unique
   password      String?   // Optionnel pour OAuth (Google, Apple)
   name          String
