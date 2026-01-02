@@ -45,6 +45,7 @@ NEXTAUTH_SECRET=générez-avec-openssl-rand-base64-32
 NEXTAUTH_URL=http://localhost:3010
 GOOGLE_CLIENT_ID=votre-client-id
 GOOGLE_CLIENT_SECRET=votre-client-secret
+INVITATION_CODE=votre-code-secret
 ```
 
 Pour `DATABASE_URL`, utiliser le format pooler Supabase avec le port 6543 et `?pgbouncer=true` pour éviter les problèmes de connexion en production.
@@ -55,6 +56,8 @@ openssl rand -base64 32
 ```
 
 Les variables `GOOGLE_CLIENT_ID` et `GOOGLE_CLIENT_SECRET` sont optionnelles si tu n'utilises pas l'authentification Google.
+
+**Important** : `INVITATION_CODE` est requis pour restreindre les inscriptions. Seuls les utilisateurs avec ce code pourront créer un compte. Si cette variable n'est pas définie, l'inscription sera ouverte à tous (non recommandé en production).
 
 ## Déploiement sur Vercel
 
@@ -81,6 +84,7 @@ Important : pour `DATABASE_URL` en production, utiliser le format pooler Supabas
 
 Le projet inclut plusieurs mesures de sécurité :
 
+- **Code d'invitation requis** : Les inscriptions sont protégées par un code d'invitation (variable `INVITATION_CODE`)
 - Rate limiting sur les routes d'authentification (5 tentatives max toutes les 15 minutes)
 - Headers de sécurité HTTP (CSP, HSTS, X-Frame-Options, etc.)
 - Logs sécurisés qui n'exposent pas d'informations sensibles en production
