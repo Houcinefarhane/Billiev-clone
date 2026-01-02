@@ -737,19 +737,19 @@ const features = [
     description: 'Centralisez toutes les informations de vos clients en un seul endroit.',
     icon: Users,
     benefits: [
-      'Fiche client complète et personnalisable',
-      'Historique des interactions',
+      'Fiche client complète',
       'Recherche rapide et intuitive',
+      'Export des données en CSV',
     ],
   },
   {
     title: 'Planning Intelligent',
-    description: 'Organisez vos rendez-vous avec un calendrier interactif et des rappels automatiques.',
+    description: 'Organisez vos rendez-vous avec un calendrier interactif.',
     icon: Calendar,
     benefits: [
       'Vue jour, semaine, mois',
-      'Rappels automatiques',
-      'Gestion des disponibilités',
+      'Gestion des interventions',
+      'Photos avant/après',
     ],
   },
   {
@@ -757,9 +757,9 @@ const features = [
     description: 'Créez des documents professionnels en quelques clics, exportables en PDF.',
     icon: FileText,
     benefits: [
-      'Templates personnalisables',
+      'Personnalisation complète (logo, couleurs, champs)',
       'Export PDF automatique',
-      'Suivi des paiements',
+      'Suivi des statuts et paiements',
     ],
   },
   {
@@ -768,8 +768,8 @@ const features = [
     icon: TrendingUp,
     benefits: [
       'Tableaux de bord en temps réel',
-      'Objectifs et indicateurs',
-      'Rapports personnalisés',
+      'Objectifs financiers',
+      'Graphiques et statistiques',
     ],
   },
   {
@@ -778,18 +778,18 @@ const features = [
     icon: Package,
     benefits: [
       'Inventaire en temps réel',
-      'Alertes automatiques',
-      'Historique des mouvements',
+      'Alertes stock faible',
+      'Gestion par catégories',
     ],
   },
   {
-    title: 'Analytics Avancés',
-    description: 'Analysez vos performances et identifiez les opportunités d\'optimisation.',
+    title: 'Analytics & Rapports',
+    description: 'Analysez vos performances avec des graphiques et statistiques.',
     icon: BarChart3,
     benefits: [
       'Tableaux de bord personnalisés',
-      'Tendances et prévisions',
-      'Rapports détaillés',
+      'Graphiques de tendances',
+      'Export des données',
     ],
   },
 ]
@@ -827,22 +827,22 @@ const faqData = [
   },
   {
     question: 'Puis-je exporter mes données ?',
-    answer: 'Oui, vous pouvez exporter vos données à tout moment. La plupart des modules (factures, devis, clients) permettent l\'export en PDF ou en formats standards pour une portabilité totale.',
+    answer: 'Oui, vous pouvez exporter vos données en CSV (factures, devis, clients, dépenses, interventions) et en PDF (factures et devis). Les exports sont disponibles directement depuis chaque module.',
   },
   {
     question: 'Y a-t-il une application mobile ?',
-    answer: 'Notre solution est entièrement responsive et fonctionne parfaitement sur tous les appareils mobiles via votre navigateur. Une application mobile native est en développement.',
+    answer: 'Notre solution est entièrement responsive et fonctionne parfaitement sur tous les appareils mobiles (smartphones, tablettes) via votre navigateur web. Pas besoin d\'installer une application.',
   },
   {
     question: 'Puis-je personnaliser les documents (factures, devis) ?',
-    answer: 'Oui, vous pouvez personnaliser vos documents avec votre logo, vos couleurs et vos informations. Des templates sont disponibles, et vous pouvez créer vos propres modèles.',
+    answer: 'Oui, vous pouvez personnaliser vos documents avec votre logo, vos couleurs, vos textes personnalisés, vos informations légales (SIREN, SIRET, RCS, KBIS, TVA, Capital) et ajouter des champs personnalisés. Tout est configurable dans le module Personnalisation.',
   },
   {
     question: 'Comment fonctionne le support client ?',
-    answer: 'Notre équipe est disponible pour vous aider. Vous pouvez nous contacter via le formulaire de contact ou consulter notre documentation complète pour trouver des réponses à vos questions.',
+    answer: 'Vous pouvez nous contacter par email (houcine.farhane@outlook.fr) ou par téléphone (07 85 69 13 00) pour toute question ou assistance. Nous répondons dans les meilleurs délais.',
   },
   {
     question: 'Puis-je migrer mes données depuis un autre système ?',
-    answer: 'Oui, nous proposons des outils d\'import pour faciliter la migration de vos données depuis d\'autres systèmes. Contactez notre support pour obtenir de l\'aide dans ce processus.',
+    answer: 'Pour l\'instant, l\'import de données n\'est pas disponible directement dans l\'interface. Contactez-nous si vous avez besoin d\'aide pour migrer vos données, nous pouvons vous assister dans ce processus.',
   },
 ]
