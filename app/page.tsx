@@ -569,9 +569,13 @@ export default function HomePage() {
                     </span>
                     <span className="text-gray-600 text-lg ml-2">/mois</span>
                   </div>
-                  <p className="text-gray-600 text-sm">
+                  <p className="text-gray-600 text-sm mb-2">
                     Résiliable à tout moment
                   </p>
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 border border-green-200">
+                    <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />
+                    <span className="text-xs font-semibold text-green-700">14 jours d'essai gratuit</span>
+                  </div>
                 </div>
                 <ul className="space-y-3 mb-6">
                   <li className="flex items-start gap-2">
