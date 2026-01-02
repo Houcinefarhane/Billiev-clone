@@ -728,7 +728,7 @@ const features = [
     ],
   },
   {
-    title: 'Samira Bouhtaine',
+    title: 'Planning Intelligent',
     description: 'Organisez vos rendez-vous avec un calendrier interactif et des rappels automatiques.',
     icon: Calendar,
     benefits: [
