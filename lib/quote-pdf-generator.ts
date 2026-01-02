@@ -89,11 +89,20 @@ export function generateQuotePDF(quote: QuoteData): void {
   } else if (!customization || customization.showLogo) {
     doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2])
     doc.roundedRect(margin, yPos, 30, 30, 3, 3, 'F')
+    // Icône Building2 (bâtiment d'entreprise - dessin manuel)
     doc.setLineWidth(2)
     doc.setDrawColor(0, 0, 0)
-    doc.line(margin + 10, yPos + 10, margin + 15, yPos + 20)
-    doc.line(margin + 15, yPos + 20, margin + 20, yPos + 10)
-    doc.line(margin + 20, yPos + 10, margin + 20, yPos + 20)
+    // Dessiner un bâtiment stylisé (rectangle avec toit)
+    // Toit
+    doc.line(margin + 5, yPos + 10, margin + 15, yPos + 5)
+    doc.line(margin + 15, yPos + 5, margin + 25, yPos + 10)
+    // Corps du bâtiment
+    doc.rect(margin + 5, yPos + 10, 20, 20)
+    // Fenêtres
+    doc.rect(margin + 8, yPos + 13, 4, 4)
+    doc.rect(margin + 18, yPos + 13, 4, 4)
+    doc.rect(margin + 8, yPos + 20, 4, 4)
+    doc.rect(margin + 18, yPos + 20, 4, 4)
   }
 
   // Nom de l'entreprise
