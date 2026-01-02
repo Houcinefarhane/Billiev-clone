@@ -889,6 +889,14 @@ export default function FacturesPage() {
                       <FileText className="w-4 h-4 mr-2" />
                       Imprimer
                     </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => handleDeleteInvoice(selectedInvoice.id)}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Supprimer
+                    </Button>
                     <Button onClick={() => handleDownloadPDF(selectedInvoice.id)}>
                       <Download className="w-4 h-4 mr-2" />
                       Télécharger PDF

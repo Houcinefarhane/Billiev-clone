@@ -286,6 +286,36 @@ export default function DevisPage() {
     }
   }
 
+  const handleDeleteQuote = async (id: string) => {
+    const quote = quotes.find((q) => q.id === id)
+    if (!quote) return
+
+    if (!confirm(`Êtes-vous sûr de vouloir supprimer le devis ${quote.quoteNumber} ?\n\nCette action est irréversible.`)) {
+      return
+    }
+
+    try {
+      const res = await fetch(`/api/quotes/${id}`, {
+        method: 'DELETE',
+      })
+
+      if (res.ok) {
+        // Fermer les détails si le devis supprimé est celui affiché
+        if (showDetails === id) {
+          setShowDetails(null)
+        }
+        // Recharger la liste
+        fetchQuotes(currentPage, searchTerm, statusFilter)
+      } else {
+        const data = await res.json()
+        alert(`Erreur: ${data.error || 'Impossible de supprimer le devis'}`)
+      }
+    } catch (error) {
+      console.error('Error deleting quote:', error)
+      alert('Erreur lors de la suppression du devis')
+    }
+  }
+
   const handleConvertToInvoice = async (id: string) => {
     if (!confirm('Convertir ce devis en facture ?')) return
 
@@ -521,6 +551,18 @@ export default function DevisPage() {
                               title="Voir les détails"
                             >
                               <Eye className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleDeleteQuote(quote.id)
+                              }}
+                              title="Supprimer le devis"
+                              className="text-destructive hover:text-destructive"
+                            >
+                              <Trash2 className="w-4 h-4" />
                             </Button>
                             {quote.status === 'accepted' && (
                               <Button
@@ -896,6 +938,14 @@ export default function DevisPage() {
                       )}
 
                       <div className="flex gap-2 justify-end pt-4 border-t border-border">
+                        <Button
+                          variant="outline"
+                          onClick={() => handleDeleteQuote(selectedQuote.id)}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Supprimer
+                        </Button>
                         {selectedQuote.status === 'accepted' && (
                           <Button onClick={() => handleConvertToInvoice(selectedQuote.id)}>
                             <ArrowRight className="w-4 h-4 mr-2" />
