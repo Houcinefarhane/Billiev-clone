@@ -160,23 +160,41 @@ export async function POST(request: Request) {
     }
 
     // Générer un numéro de devis unique
-    const existingQuotes = await prisma.quote.findMany({
+    // Récupérer toutes les devis de l'artisan pour trouver le numéro le plus élevé
+    const allQuotes = await prisma.quote.findMany({
       where: { artisanId: artisan.id },
       select: { quoteNumber: true },
-      orderBy: { createdAt: 'desc' },
     })
 
-    // Trouver le numéro le plus élevé
+    // Extraire tous les numéros et trouver le maximum
     let maxNumber = 0
-    for (const quote of existingQuotes) {
+    for (const quote of allQuotes) {
       const match = quote.quoteNumber.match(/DEV-(\d+)/)
       if (match) {
         const num = parseInt(match[1], 10)
-        if (num > maxNumber) maxNumber = num
+        if (num > maxNumber) {
+          maxNumber = num
+        }
       }
     }
 
-    const quoteNumber = `DEV-${String(maxNumber + 1).padStart(6, '0')}`
+    // Générer le nouveau numéro et vérifier l'unicité
+    let nextNumber = maxNumber + 1
+    let quoteNumber = `DEV-${String(nextNumber).padStart(6, '0')}`
+    
+    // Vérifier que le numéro n'existe pas déjà (sécurité supplémentaire)
+    // Si le numéro existe, chercher le prochain disponible
+    let existingQuote = await prisma.quote.findUnique({
+      where: { quoteNumber },
+    })
+    
+    while (existingQuote) {
+      nextNumber++
+      quoteNumber = `DEV-${String(nextNumber).padStart(6, '0')}`
+      existingQuote = await prisma.quote.findUnique({
+        where: { quoteNumber },
+      })
+    }
 
     // Créer le devis avec ses items
     const quote = await prisma.quote.create({
