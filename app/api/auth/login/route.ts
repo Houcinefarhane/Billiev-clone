@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { compare } from 'bcryptjs'
-import { rateLimit } from '@/lib/rate-limit'
-import { headers } from 'next/headers'
+import { createServerSupabaseClient } from '@/lib/supabase'
 import { logger } from '@/lib/logger'
 
 export const dynamic = 'force-dynamic'
@@ -19,110 +17,85 @@ export async function POST(request: Request) {
       )
     }
 
-    // 🔒 RATE LIMITING : Protection contre brute force
-    // Pourquoi ? Sans ça, un hacker peut essayer 1000 mots de passe/seconde
-    // Avec ça : maximum 5 tentatives toutes les 15 minutes par IP/email
-    const headersList = await headers()
-    const ip = headersList.get('x-forwarded-for') || headersList.get('x-real-ip') || 'unknown'
-    const identifier = `${ip}:${email.toLowerCase().trim()}`
-    
-    const rateLimitResult = rateLimit(identifier, 5, 15 * 60 * 1000) // 5 tentatives / 15 min
-    
-    if (!rateLimitResult.allowed) {
-      const retryAfter = Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000)
+    const supabase = createServerSupabaseClient()
+
+    // Authentifier avec Supabase Auth (gère automatiquement le rate limiting)
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+      email: email.toLowerCase().trim(),
+      password,
+    })
+
+    if (authError) {
+      // Supabase Auth gère déjà le rate limiting, donc on peut retourner l'erreur directement
+      if (authError.message.includes('rate limit') || authError.message.includes('too many')) {
+        return NextResponse.json(
+          { error: 'Trop de tentatives de connexion. Veuillez réessayer dans quelques minutes.' },
+          { status: 429 }
+        )
+      }
+
       return NextResponse.json(
-        { 
-          error: 'Trop de tentatives de connexion. Veuillez réessayer dans quelques minutes.',
-          retryAfter 
-        },
-        { 
-          status: 429,
-          headers: {
-            'Retry-After': retryAfter.toString(),
-            'X-RateLimit-Limit': '5',
-            'X-RateLimit-Remaining': '0',
-            'X-RateLimit-Reset': new Date(rateLimitResult.resetTime).toISOString(),
-          }
-        }
+        { error: 'Email ou mot de passe incorrect' },
+        { status: 401 }
       )
     }
 
-    // Vérifier DATABASE_URL (sans logger les détails sensibles)
-    if (!process.env.DATABASE_URL) {
-      logger.error('DATABASE_URL non défini')
+    if (!authData.user) {
       return NextResponse.json(
-        { error: 'Configuration de la base de données manquante. Contactez l\'administrateur.' },
+        { error: 'Erreur lors de la connexion' },
         { status: 500 }
       )
     }
-    
-    let artisan
-    try {
-      await prisma.$connect()
-      
-      const emailNormalized = email.toLowerCase().trim()
-      
-      artisan = await prisma.artisan.findUnique({
-        where: { email: emailNormalized },
-      })
-    } catch (dbError: any) {
-      logger.error('Erreur base de données', { code: dbError?.code })
-      
-      // Vérifier le type d'erreur Prisma
-      if (dbError?.code === 'P1001') {
-        throw new Error('Impossible de se connecter à la base de données. Vérifiez votre configuration DATABASE_URL dans Vercel.')
-      }
-      
-      if (dbError?.code === 'P1000') {
-        throw new Error('Échec d\'authentification à la base de données. Vérifiez le mot de passe dans DATABASE_URL.')
-      }
-      
-      // Vérifier si c'est une erreur de format DATABASE_URL
-      if (dbError?.message?.includes('did not match the expected pattern') || 
-          dbError?.message?.includes('Invalid connection string') ||
-          dbError?.code === 'P1013') {
-        throw new Error('Format de connexion à la base de données invalide. Vérifiez votre DATABASE_URL dans Vercel.')
-      }
-      
-      // Erreur générique
-      throw new Error(`Erreur de connexion à la base de données: ${dbError?.message || 'Erreur inconnue'} (Code: ${dbError?.code || 'N/A'})`)
-    }
+
+    // Récupérer l'artisan depuis Prisma
+    const artisan = await prisma.artisan.findUnique({
+      where: { id: authData.user.id },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        companyName: true,
+        phone: true,
+      },
+    })
 
     if (!artisan) {
-      return NextResponse.json(
-        { error: 'Email ou mot de passe incorrect' },
-        { status: 401 }
-      )
+      // L'utilisateur existe dans Supabase Auth mais pas dans Prisma
+      // Créer l'artisan avec les données de Supabase Auth
+      const newArtisan = await prisma.artisan.create({
+        data: {
+          id: authData.user.id,
+          name: authData.user.user_metadata?.name || authData.user.email?.split('@')[0] || 'Utilisateur',
+          email: authData.user.email!,
+          password: null,
+          companyName: authData.user.user_metadata?.companyName || null,
+          phone: authData.user.user_metadata?.phone || null,
+          emailVerified: authData.user.email_confirmed_at !== null,
+          emailVerificationToken: null,
+          emailVerificationTokenExpires: null,
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          companyName: true,
+          phone: true,
+        },
+      })
+
+      logger.info('Artisan créé automatiquement depuis Supabase Auth')
+
+      const response = NextResponse.json({
+        success: true,
+        artisan: newArtisan,
+      })
+
+      return response
     }
 
-    // Vérifier le mot de passe
-    let isValidPassword = false
-    try {
-      if (!artisan.password) {
-        // Compte OAuth sans mot de passe
-        isValidPassword = false
-      } else {
-        isValidPassword = await compare(password, artisan.password)
-      }
-    } catch (compareError: any) {
-      // Ne pas logger l'erreur en production (peut exposer des infos)
-      if (process.env.NODE_ENV === 'development') {
-        console.error('Erreur lors de la comparaison du mot de passe:', compareError?.message)
-      }
-      isValidPassword = false
-    }
+    logger.info('Connexion réussie via Supabase Auth')
 
-    if (!isValidPassword) {
-      return NextResponse.json(
-        { error: 'Email ou mot de passe incorrect' },
-        { status: 401 }
-      )
-    }
-
-    // Connexion autorisée
-    logger.info('Connexion réussie')
-
-    // Créer un cookie de session (simplifié - dans un vrai projet, utiliser JWT)
+    // La session est gérée automatiquement par Supabase via les cookies
     const response = NextResponse.json({
       success: true,
       artisan: {
@@ -132,46 +105,12 @@ export async function POST(request: Request) {
       },
     })
 
-    // Définir le cookie dans la réponse
-    const isProduction = process.env.NODE_ENV === 'production'
-    
-    // Utiliser response.cookies.set() (méthode Next.js recommandée)
-    response.cookies.set('artisanId', artisan.id, {
-      httpOnly: true,
-      secure: isProduction, // HTTPS en production
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7, // 7 jours
-      path: '/',
-    })
-    
-    // Cookie défini avec succès
-    
-    // Ajouter headers rate limit dans la réponse
-    response.headers.set('X-RateLimit-Limit', '5')
-    response.headers.set('X-RateLimit-Remaining', rateLimitResult.remaining.toString())
-    response.headers.set('X-RateLimit-Reset', new Date(rateLimitResult.resetTime).toISOString())
-
     return response
   } catch (error: any) {
     logger.error('Erreur login', { code: error?.code })
     
-    // Messages d'erreur génériques (ne pas exposer de détails techniques)
-    let errorMessage = 'Erreur lors de la connexion'
-    
-    // Messages d'erreur génériques (ne pas exposer de détails techniques en production)
-    if (error?.code === 'P1001' || error?.message?.includes('Can\'t reach database server')) {
-      errorMessage = 'Impossible de se connecter à la base de données'
-    } else if (error?.code === 'P1000') {
-      errorMessage = 'Erreur de configuration de la base de données'
-    } else if (error?.code === 'P1013' || error?.message?.includes('did not match')) {
-      errorMessage = 'Erreur de configuration de la base de données'
-    } else if (error?.message?.includes('DATABASE_URL manquant')) {
-      errorMessage = 'Configuration de la base de données manquante'
-    }
-    
-    // Retourner un message générique (sans détails techniques)
     return NextResponse.json(
-      { error: errorMessage },
+      { error: 'Erreur lors de la connexion. Veuillez réessayer.' },
       { status: 500 }
     )
   }
