@@ -604,34 +604,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-12" style={{ backgroundColor: 'rgb(150, 185, 220)' }}>
-        <div className="container mx-auto px-4 max-w-3xl">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Prêt à simplifier votre gestion ?
-            </h2>
-            <p className="text-lg mb-6" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>
-              Rejoignez dès aujourd'hui et découvrez comment gagner du temps sur vos tâches administratives.
-            </p>
-            <button
-              onClick={() => scrollToSection('pricing')}
-              className="text-lg px-8 py-6 h-14 bg-white hover:bg-gray-100 font-medium shadow-xl hover:shadow-2xl transition-all duration-300 group rounded-lg inline-flex items-center"
-              style={{ color: 'rgb(150, 185, 220)' }}
-            >
-              Voir les tarifs
-              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </button>
-          </motion.div>
-        </div>
-      </section>
-
       {/* FAQ Section */}
       <section id="faq" className="py-12 bg-white scroll-mt-16">
         <div className="container mx-auto px-4 max-w-4xl">
