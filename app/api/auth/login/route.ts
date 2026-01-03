@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { createServerSupabaseClient } from '@/lib/supabase'
+import { createClient } from '@supabase/supabase-js'
+import { compare } from 'bcryptjs'
 import { logger } from '@/lib/logger'
 
 export const dynamic = 'force-dynamic'
@@ -25,6 +27,7 @@ export async function POST(request: Request) {
       password,
     })
 
+    // Si Supabase Auth échoue, vérifier si c'est un ancien compte (existe dans Prisma avec mot de passe)
     if (authError) {
       // Supabase Auth gère déjà le rate limiting
       if (authError.message.includes('rate limit') || authError.message.includes('too many')) {
@@ -34,6 +37,117 @@ export async function POST(request: Request) {
         )
       }
 
+      // Fallback : vérifier si c'est un ancien compte dans Prisma
+      const oldArtisan = await prisma.artisan.findUnique({
+        where: { email: email.toLowerCase().trim() },
+        select: {
+          id: true,
+          password: true,
+          name: true,
+          email: true,
+          companyName: true,
+          phone: true,
+        },
+      })
+
+      // Si l'utilisateur existe dans Prisma avec un mot de passe (ancien système)
+      if (oldArtisan && oldArtisan.password) {
+        // Vérifier le mot de passe
+        const isPasswordValid = await compare(password, oldArtisan.password)
+        
+        if (!isPasswordValid) {
+          return NextResponse.json(
+            { error: 'Email ou mot de passe incorrect' },
+            { status: 401 }
+          )
+        }
+
+        // Migrer l'utilisateur vers Supabase Auth
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+        const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+        if (!supabaseUrl || !supabaseServiceKey) {
+          return NextResponse.json(
+            { error: 'Configuration serveur incorrecte' },
+            { status: 500 }
+          )
+        }
+
+        const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
+          auth: {
+            autoRefreshToken: false,
+            persistSession: false
+          }
+        })
+
+        // Créer l'utilisateur dans Supabase Auth (Supabase génère un UUID)
+        const { data: newAuthData, error: createError } = await supabaseAdmin.auth.admin.createUser({
+          email: oldArtisan.email,
+          password, // Le mot de passe en clair (Supabase le hash automatiquement)
+          email_confirm: true,
+          user_metadata: {
+            name: oldArtisan.name,
+            companyName: oldArtisan.companyName || null,
+            phone: oldArtisan.phone || null,
+          },
+        })
+
+        if (createError) {
+          console.error('Erreur migration vers Supabase Auth:', createError)
+          return NextResponse.json(
+            { error: 'Erreur lors de la migration du compte. Veuillez réessayer.' },
+            { status: 500 }
+          )
+        }
+
+        if (!newAuthData.user) {
+          return NextResponse.json(
+            { error: 'Erreur lors de la création du compte dans Supabase Auth' },
+            { status: 500 }
+          )
+        }
+
+        // Mettre à jour Prisma : changer l'ID pour correspondre à Supabase Auth et supprimer le mot de passe
+        await prisma.artisan.update({
+          where: { id: oldArtisan.id },
+          data: {
+            id: newAuthData.user.id, // Mettre à jour l'ID avec celui de Supabase Auth
+            password: null,
+            emailVerified: true,
+          },
+        })
+
+        logger.info(`Utilisateur ${oldArtisan.email} migré vers Supabase Auth`)
+
+        // Connecter l'utilisateur via Supabase Auth
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          email: oldArtisan.email,
+          password,
+        })
+
+        if (signInError || !signInData.user) {
+          return NextResponse.json(
+            { error: 'Erreur lors de la connexion après migration' },
+            { status: 500 }
+          )
+        }
+
+        // Retourner les données de l'artisan
+        const response = NextResponse.json({
+          success: true,
+          artisan: {
+            id: oldArtisan.id,
+            name: oldArtisan.name,
+            email: oldArtisan.email,
+            companyName: oldArtisan.companyName,
+            phone: oldArtisan.phone,
+          },
+        })
+
+        return response
+      }
+
+      // Si pas d'ancien compte, retourner l'erreur normale
       return NextResponse.json(
         { error: 'Email ou mot de passe incorrect' },
         { status: 401 }
