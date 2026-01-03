@@ -539,11 +539,9 @@ export default function HomePage() {
                   }`}
                 >
                   Paiement annuel
-                  {pricingType === 'unique' && (
-                    <span className="absolute -top-2 -right-2 px-2 py-0.5 rounded-full text-xs font-semibold text-white shadow-sm" style={{ backgroundColor: 'rgb(34, 197, 94)' }}>
-                      -29%
-                    </span>
-                  )}
+                  <span className="absolute -top-2 -right-2 px-2 py-0.5 rounded-full text-xs font-semibold text-white shadow-sm" style={{ backgroundColor: 'rgb(34, 197, 94)' }}>
+                    -29%
+                  </span>
                 </button>
               </div>
             </div>
