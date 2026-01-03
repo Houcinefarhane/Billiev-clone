@@ -10,11 +10,15 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY')
 }
 
+// Assertions de type pour TypeScript (on sait qu'ils sont définis après la vérification)
+const SUPABASE_URL = supabaseUrl as string
+const SUPABASE_ANON_KEY = supabaseAnonKey as string
+
 // Client pour usage côté serveur (API routes, Server Components)
 export function createServerSupabaseClient() {
   const cookieStore = cookies()
 
-  return createServerClient(supabaseUrl, supabaseAnonKey, {
+  return createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     cookies: {
       getAll() {
         return cookieStore.getAll()
@@ -36,9 +40,9 @@ export function createServerSupabaseClient() {
 
 // Client pour usage côté client (Client Components)
 export function createClientSupabaseClient() {
-  return createClient(supabaseUrl, supabaseAnonKey)
+  return createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 }
 
 // Client simple pour usage dans les API routes
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
