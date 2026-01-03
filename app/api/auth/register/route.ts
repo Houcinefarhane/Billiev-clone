@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createClient } from '@supabase/supabase-js'
 
 export async function POST(request: Request) {
   try {
@@ -35,19 +35,33 @@ export async function POST(request: Request) {
       )
     }
 
-    const supabase = createServerSupabaseClient()
+    // Client Supabase avec service role pour créer et vérifier l'email automatiquement
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
-    // Créer l'utilisateur dans Supabase Auth
-    const { data: authData, error: authError } = await supabase.auth.signUp({
+    if (!supabaseUrl || !supabaseServiceKey) {
+      return NextResponse.json(
+        { error: 'Configuration serveur incorrecte' },
+        { status: 500 }
+      )
+    }
+
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    })
+
+    // Créer l'utilisateur dans Supabase Auth avec email automatiquement vérifié
+    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email: email.toLowerCase().trim(),
       password,
-      options: {
-        emailRedirectTo: `${process.env.NEXTAUTH_URL || 'http://localhost:3010'}/auth/verify-email`,
-        data: {
-          name,
-          companyName: companyName || null,
-          phone: phone || null,
-        },
+      email_confirm: true, // Marquer l'email comme vérifié automatiquement
+      user_metadata: {
+        name,
+        companyName: companyName || null,
+        phone: phone || null,
       },
     })
 
@@ -72,24 +86,20 @@ export async function POST(request: Request) {
         id: authData.user.id, // Utiliser l'ID de Supabase Auth
         name,
         email: email.toLowerCase().trim(),
-        password: null, // Plus besoin de stocker le mot de passe (stocké dans Supabase Auth)
+        password: null, // Stocké dans Supabase Auth
         companyName: companyName || null,
         phone: phone || null,
-        emailVerified: authData.user.email_confirmed_at !== null,
+        emailVerified: true, // Toujours vrai car on vérifie automatiquement
         emailVerificationToken: null,
         emailVerificationTokenExpires: null,
       },
     })
-
-    // Si l'email n'est pas vérifié, mettre à jour Prisma quand il sera vérifié
-    // (géré automatiquement par Supabase Auth)
 
     // Compte créé avec succès
     return NextResponse.json({
       success: true,
       message: 'Compte créé avec succès ! Vous pouvez maintenant vous connecter.',
       artisanId: artisan.id,
-      requiresEmailVerification: !authData.user.email_confirmed_at,
     })
   } catch (error: any) {
     console.error('Registration error:', error)

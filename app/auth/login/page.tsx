@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Building2, Mail, CheckCircle } from 'lucide-react'
+import { Building2, CheckCircle } from 'lucide-react'
 
 function LoginContent() {
   const router = useRouter()
@@ -17,9 +17,6 @@ function LoginContent() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const [requiresVerification, setRequiresVerification] = useState(false)
-  const [resending, setResending] = useState(false)
-  const [resendMessage, setResendMessage] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
 
   // Vérifier si l'utilisateur vient de s'inscrire
@@ -64,20 +61,8 @@ function LoginContent() {
         console.error('Erreur de connexion:', data)
         console.error('Status:', res.status)
         console.error('Response OK:', res.ok)
-        if (data.requiresEmailVerification) {
-          setRequiresVerification(true)
-          setError(data.error || 'Votre email n\'a pas été vérifié. Veuillez vérifier votre boîte mail et cliquer sur le lien de confirmation.')
-        } else {
-          // Afficher l'erreur avec les suggestions si disponibles
-          let errorMsg = data.error || 'Erreur de connexion'
-          if (data.suggestion) {
-            errorMsg += `\n\nSuggestion: ${data.suggestion}`
-          }
-          if (data.code) {
-            errorMsg += `\n\nCode d'erreur: ${data.code}`
-          }
-          setError(errorMsg)
-        }
+        // Afficher l'erreur
+        setError(data.error || 'Erreur de connexion')
         setLoading(false)
       }
     } catch (err: any) {
@@ -167,54 +152,11 @@ function LoginContent() {
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
-                  className={`rounded-lg p-3 ${
-                    requiresVerification 
-                      ? 'bg-yellow-100 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800' 
-                      : 'bg-destructive/10 border border-destructive/20'
-                  }`}
+                  className="rounded-lg p-3 bg-destructive/10 border border-destructive/20"
                 >
-                  <p className={`text-sm ${requiresVerification ? 'text-yellow-800 dark:text-yellow-200' : 'text-destructive'}`}>
+                  <p className="text-sm text-destructive">
                     {error}
                   </p>
-                  {requiresVerification && (
-                    <div className="mt-3 space-y-2">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={async () => {
-                          setResending(true)
-                          setResendMessage('')
-                          try {
-                            // Utiliser la nouvelle route Supabase pour renvoyer l'email de vérification
-                            const res = await fetch('/api/auth/resend-supabase-verification', {
-                              method: 'POST',
-                              headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({ email }),
-                            })
-                            const data = await res.json()
-                            if (res.ok) {
-                              setResendMessage(data.message || 'Un nouveau lien a été envoyé à votre adresse email.')
-                            } else {
-                              setResendMessage(data.error || 'Erreur lors de l\'envoi')
-                            }
-                          } catch (err) {
-                            setResendMessage('Une erreur est survenue')
-                          } finally {
-                            setResending(false)
-                          }
-                        }}
-                        disabled={resending}
-                        className="w-full"
-                      >
-                        <Mail className="w-4 h-4 mr-2" />
-                        {resending ? 'Envoi...' : 'Renvoyer l\'email de vérification'}
-                      </Button>
-                      {resendMessage && (
-                        <p className="text-xs text-green-700 dark:text-green-400">{resendMessage}</p>
-                      )}
-                    </div>
-                  )}
                 </motion.div>
               )}
               <Button

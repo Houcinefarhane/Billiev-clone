@@ -26,22 +26,11 @@ export async function POST(request: Request) {
     })
 
     if (authError) {
-      // Supabase Auth gère déjà le rate limiting, donc on peut retourner l'erreur directement
+      // Supabase Auth gère déjà le rate limiting
       if (authError.message.includes('rate limit') || authError.message.includes('too many')) {
         return NextResponse.json(
           { error: 'Trop de tentatives de connexion. Veuillez réessayer dans quelques minutes.' },
           { status: 429 }
-        )
-      }
-
-      // Erreur spécifique pour email non vérifié
-      if (authError.message.includes('email') && authError.message.includes('confirm')) {
-        return NextResponse.json(
-          { 
-            error: 'Votre email n\'a pas été vérifié. Veuillez vérifier votre boîte mail et cliquer sur le lien de confirmation.',
-            requiresEmailVerification: true
-          },
-          { status: 401 }
         )
       }
 
@@ -81,7 +70,7 @@ export async function POST(request: Request) {
           password: null,
           companyName: authData.user.user_metadata?.companyName || null,
           phone: authData.user.user_metadata?.phone || null,
-          emailVerified: authData.user.email_confirmed_at !== null,
+          emailVerified: true, // Toujours vrai car on vérifie automatiquement à la création
           emailVerificationToken: null,
           emailVerificationTokenExpires: null,
         },
