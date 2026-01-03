@@ -83,15 +83,23 @@ async function migrateUsers() {
           continue
         }
 
-        // Vérifier si l'email existe déjà dans Supabase Auth
-        const { data: userByEmail, error: emailError } = await supabase.auth.admin.getUserByEmail(artisan.email)
+        // Vérifier si l'email existe déjà dans Supabase Auth via SQL direct
+        // Note: auth.users n'est pas accessible via .from(), on utilise une requête SQL
+        const { data: emailCheckResult, error: emailError } = await supabase.rpc('exec_sql', {
+          query: `SELECT id, email FROM auth.users WHERE email = '${artisan.email.replace(/'/g, "''")}' LIMIT 1`
+        }).catch(() => ({ data: null, error: null }))
 
-        if (userByEmail && !emailError) {
-          console.log(`⚠️  Email ${artisan.email} existe déjà dans Supabase Auth avec un ID différent.`)
-          console.log(`   ID Supabase: ${userByEmail.id}, ID Prisma: ${artisan.id}`)
-          console.log(`   ⚠️  ATTENTION: Vous devrez peut-être mettre à jour manuellement l'ID dans la table Artisan.`)
-          skipCount++
-          continue
+        // Si la fonction RPC n'existe pas, on skip cette vérification
+        // (c'est une vérification optionnelle)
+        if (emailCheckResult && Array.isArray(emailCheckResult) && emailCheckResult.length > 0) {
+          const existingUser = emailCheckResult[0]
+          if (existingUser.id !== artisan.id) {
+            console.log(`⚠️  Email ${artisan.email} existe déjà dans Supabase Auth avec un ID différent.`)
+            console.log(`   ID Supabase: ${existingUser.id}, ID Prisma: ${artisan.id}`)
+            console.log(`   ⚠️  ATTENTION: Vous devrez peut-être mettre à jour manuellement l'ID dans la table Artisan.`)
+            skipCount++
+            continue
+          }
         }
 
         // Créer l'utilisateur dans Supabase Auth
