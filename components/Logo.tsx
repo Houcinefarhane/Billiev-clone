@@ -1,4 +1,4 @@
-import { Building2 } from 'lucide-react'
+import Image from 'next/image'
 
 interface LogoProps {
   className?: string
@@ -8,9 +8,9 @@ interface LogoProps {
 
 export function Logo({ className = '', size = 'md', showText = true }: LogoProps) {
   const sizeClasses = {
-    sm: 'w-8 h-8',
-    md: 'w-12 h-12',
-    lg: 'w-16 h-16',
+    sm: 'h-6',
+    md: 'h-8',
+    lg: 'h-12',
   }
 
   const textSizes = {
@@ -19,19 +19,37 @@ export function Logo({ className = '', size = 'md', showText = true }: LogoProps
     lg: 'text-2xl',
   }
 
+  // Pour les petites tailles, on affiche juste le symbole B
+  if (size === 'sm' && !showText) {
+    return (
+      <div className={`flex items-center ${className}`} role="banner">
+        <div className="w-8 h-8 rounded-xl relative overflow-hidden shadow-lg" style={{ background: 'linear-gradient(135deg, #4a90e2 0%, #96b9dc 100%)' }}>
+          <div className="absolute top-0 right-0 w-3 h-3" style={{ backgroundColor: '#96b9dc' }}>
+            <div className="absolute top-0 right-0 w-0 h-0 border-l-[6px] border-l-transparent border-b-[6px] border-b-white"></div>
+          </div>
+          <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-lg">B</span>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className={`flex items-center gap-3 ${className}`} role="banner">
-      <div className={`${sizeClasses[size]} rounded-xl bg-primary flex items-center justify-center shadow-lg`} aria-hidden="true">
-        <Building2 className={`${size === 'sm' ? 'w-4 h-4' : size === 'md' ? 'w-6 h-6' : 'w-8 h-8'} text-primary-foreground`} strokeWidth={2} aria-hidden="true" />
-      </div>
-      {showText && (
-        <div>
-          <h1 className={`${textSizes[size]} font-bold tracking-tight`}>
-            Gestion Pro
-          </h1>
-          <p className={`${size === 'sm' ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
-            Gestion professionnelle
-          </p>
+      {showText ? (
+        <Image
+          src="/logo-billieve.svg"
+          alt="Billieve"
+          width={size === 'sm' ? 200 : size === 'md' ? 250 : 300}
+          height={size === 'sm' ? 75 : size === 'md' ? 94 : 113}
+          className={sizeClasses[size]}
+          priority
+        />
+      ) : (
+        <div className="w-12 h-12 rounded-xl relative overflow-hidden shadow-lg" style={{ background: 'linear-gradient(135deg, #4a90e2 0%, #96b9dc 100%)' }}>
+          <div className="absolute top-0 right-0 w-3 h-3" style={{ backgroundColor: '#96b9dc' }}>
+            <div className="absolute top-0 right-0 w-0 h-0 border-l-[6px] border-l-transparent border-b-[6px] border-b-white"></div>
+          </div>
+          <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-2xl">B</span>
         </div>
       )}
     </div>
