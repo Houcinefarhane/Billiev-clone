@@ -37,7 +37,7 @@ export function Logo({ className = '', size = 'md', showText = true }: LogoProps
     <div className={`flex items-center gap-3 ${className}`} role="banner">
       {showText ? (
         <Image
-          src="/logo-billieve.svg"
+          src="/logo-billieve.png"
           alt="Billiev"
           width={size === 'sm' ? 200 : size === 'md' ? 320 : 1200}
           height={size === 'sm' ? 75 : size === 'md' ? 120 : 450}
