@@ -148,7 +148,10 @@ export function Sidebar() {
             animate={{ opacity: 1, y: 0 }}
             className="mb-2 flex items-center justify-between"
           >
-            <Logo size="lg" />
+            <div className="flex items-center gap-3">
+              <Logo size="lg" showText={false} />
+              <span className="text-xl font-bold text-gray-900">Billiev</span>
+            </div>
             <Button
               variant="ghost"
               size="icon"
