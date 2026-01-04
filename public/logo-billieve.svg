@@ -33,14 +33,14 @@
           text-anchor="middle">B</text>
   </g>
   
-  <!-- Texte BILLIEVE -->
+  <!-- Texte BILLIEV -->
   <text x="200" y="175" 
         font-family="'SF Pro Display', 'Inter', -apple-system, sans-serif" 
         font-size="90" 
         font-weight="800" 
         fill="#1f2937" 
         letter-spacing="-2">
-    <tspan fill="#4a90e2">Bill</tspan><tspan fill="#1f2937">ieve</tspan>
+    <tspan fill="#4a90e2">Bill</tspan><tspan fill="#1f2937">iev</tspan>
   </text>
   
   <!-- Tagline -->

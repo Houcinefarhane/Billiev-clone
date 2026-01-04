@@ -9,8 +9,8 @@ interface LogoProps {
 export function Logo({ className = '', size = 'md', showText = true }: LogoProps) {
   const sizeClasses = {
     sm: 'h-6',
-    md: 'h-8',
-    lg: 'h-12',
+    md: 'h-10',
+    lg: 'h-16',
   }
 
   const textSizes = {
@@ -39,8 +39,8 @@ export function Logo({ className = '', size = 'md', showText = true }: LogoProps
         <Image
           src="/logo-billieve.svg"
           alt="Billiev"
-          width={size === 'sm' ? 200 : size === 'md' ? 250 : 300}
-          height={size === 'sm' ? 75 : size === 'md' ? 94 : 113}
+          width={size === 'sm' ? 200 : size === 'md' ? 320 : 400}
+          height={size === 'sm' ? 75 : size === 'md' ? 120 : 150}
           className={sizeClasses[size]}
           priority
         />
