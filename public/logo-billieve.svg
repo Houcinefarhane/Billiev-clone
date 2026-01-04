@@ -26,7 +26,7 @@
     
     <!-- B blanc découpé -->
     <text x="0" y="25" 
-          font-family="'SF Pro Display', 'Inter', -apple-system, sans-serif" 
+          font-family="'Space Grotesk', -apple-system, sans-serif" 
           font-size="90" 
           font-weight="800" 
           fill="#ffffff" 
@@ -35,7 +35,7 @@
   
   <!-- Texte BILLIEV -->
   <text x="200" y="175" 
-        font-family="'SF Pro Display', 'Inter', -apple-system, sans-serif" 
+        font-family="'Space Grotesk', -apple-system, sans-serif" 
         font-size="90" 
         font-weight="800" 
         fill="#1f2937" 
@@ -45,7 +45,7 @@
   
   <!-- Tagline -->
   <text x="200" y="210" 
-        font-family="'SF Pro Display', 'Inter', -apple-system, sans-serif" 
+        font-family="'Space Grotesk', -apple-system, sans-serif" 
         font-size="24" 
         font-weight="400" 
         fill="#6b7280" 
