@@ -48,7 +48,7 @@ export default function HomePage() {
             <div className="flex items-center gap-3">
               <Logo size="md" showText={false} />
               <span className="hidden sm:block text-sm font-medium text-gray-600 tracking-wider">
-                BILLIEVE IN YOUR BUSINESS
+                BILLIEV IN YOUR BUSINESS
               </span>
             </div>
 
@@ -203,7 +203,7 @@ export default function HomePage() {
                   5 outils
                 </span>
                 <span className="block mt-2 text-2xl md:text-3xl lg:text-4xl font-normal" style={{ color: 'rgb(150, 185, 220)' }}>
-                  Billieve
+                  Billiev
                 </span>
               </motion.h1>
               
@@ -646,7 +646,7 @@ export default function HomePage() {
               Ce que disent nos utilisateurs
             </h2>
             <p className="text-lg text-gray-600">
-              Découvrez comment Billieve transforme leur quotidien
+              Découvrez comment Billiev transforme leur quotidien
             </p>
           </motion.div>
 
@@ -667,7 +667,7 @@ export default function HomePage() {
                 ))}
               </div>
               <p className="text-gray-700 mb-4 leading-relaxed">
-                "Billieve a complètement transformé ma façon de travailler. Avant, je perdais des heures chaque semaine à jongler entre plusieurs outils. Maintenant, tout est centralisé dans une seule interface moderne et intuitive. La gestion des factures et du planning est devenue un jeu d'enfant !"
+                "Billiev a complètement transformé ma façon de travailler. Avant, je perdais des heures chaque semaine à jongler entre plusieurs outils. Maintenant, tout est centralisé dans une seule interface moderne et intuitive. La gestion des factures et du planning est devenue un jeu d'enfant !"
               </p>
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold text-lg">
@@ -696,7 +696,7 @@ export default function HomePage() {
                 ))}
               </div>
               <p className="text-gray-700 mb-4 leading-relaxed">
-                "En tant qu'artisan indépendant, j'avais besoin d'un outil simple mais complet. Billieve répond parfaitement à mes besoins : gestion des clients, planning des interventions, facturation et suivi financier. L'interface est moderne et je n'ai eu besoin d'aucune formation pour m'y retrouver. Un vrai gain de temps !"
+                "En tant qu'artisan indépendant, j'avais besoin d'un outil simple mais complet. Billiev répond parfaitement à mes besoins : gestion des clients, planning des interventions, facturation et suivi financier. L'interface est moderne et je n'ai eu besoin d'aucune formation pour m'y retrouver. Un vrai gain de temps !"
               </p>
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white font-bold text-lg">
@@ -805,7 +805,7 @@ export default function HomePage() {
                 </div>
               </a>
               <a
-                href="mailto:houcine.farhane@outlook.fr?subject=Demande d'information - Billieve"
+                href="mailto:houcine.farhane@outlook.fr?subject=Demande d'information - Billiev"
                 className="flex items-center gap-3 px-6 py-4 rounded-xl bg-white border-2 border-gray-200 hover:border-gray-300 shadow-lg hover:shadow-xl transition-all duration-300 group"
               >
                 <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(150, 185, 220, 0.1)' }}>
@@ -836,7 +836,7 @@ const features = [
     ],
   },
   {
-    title: 'Billieve',
+    title: 'Billiev',
     description: 'Organisez vos rendez-vous avec un calendrier interactif et des rappels automatiques.',
     icon: Calendar,
     benefits: [

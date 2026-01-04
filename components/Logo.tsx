@@ -38,7 +38,7 @@ export function Logo({ className = '', size = 'md', showText = true }: LogoProps
       {showText ? (
         <Image
           src="/logo-billieve.svg"
-          alt="Billieve"
+          alt="Billiev"
           width={size === 'sm' ? 200 : size === 'md' ? 250 : 300}
           height={size === 'sm' ? 75 : size === 'md' ? 94 : 113}
           className={sizeClasses[size]}

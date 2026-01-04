@@ -1,6 +1,6 @@
 {
-  "name": "Billieve - ERP Complet",
-  "short_name": "Billieve",
+  "name": "Billiev - ERP Complet",
+  "short_name": "Billiev",
   "description": "ERP complet pour gérer l'ensemble de votre entreprise : clients, factures, devis, stock, planning et finances",
   "start_url": "/",
   "display": "standalone",

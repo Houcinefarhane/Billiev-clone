@@ -12,14 +12,14 @@ const spaceGrotesk = Space_Grotesk({
 
 export const metadata: Metadata = {
   title: {
-    default: 'Billieve - ERP Complet',
-    template: '%s | Billieve',
+    default: 'Billiev - ERP Complet',
+    template: '%s | Billiev',
   },
   description: 'ERP complet pour gérer l\'ensemble de votre entreprise : clients, factures, devis, stock, planning, finances et analytics en temps réel.',
   keywords: ['dashboard', 'gestion', 'factures', 'devis', 'planning', 'clients', 'finances', 'stock', 'analytics'],
-  authors: [{ name: 'Billieve' }],
-  creator: 'Billieve',
-  publisher: 'Billieve',
+  authors: [{ name: 'Billiev' }],
+  creator: 'Billiev',
+  publisher: 'Billiev',
   formatDetection: {
     email: false,
     address: false,
@@ -34,13 +34,13 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'fr_FR',
     url: '/',
-    title: 'Billieve - ERP Complet',
+    title: 'Billiev - ERP Complet',
     description: 'ERP complet pour gérer l\'ensemble de votre entreprise : clients, factures, devis, stock, planning, finances et analytics en temps réel.',
-    siteName: 'Billieve',
+    siteName: 'Billiev',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Billieve - ERP Complet',
+    title: 'Billiev - ERP Complet',
     description: 'Solution ERP complète pour gérer votre entreprise',
   },
   robots: {
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Billieve',
+    title: 'Billiev',
   },
   icons: {
     icon: '/favicon.ico',
@@ -78,7 +78,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#96B9DC" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="Billieve" />
+        <meta name="apple-mobile-web-app-title" content="Billiev" />
         <meta name="color-scheme" content="light dark" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
