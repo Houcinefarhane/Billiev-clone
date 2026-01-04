@@ -310,9 +310,14 @@ export function generateInvoicePDF(invoice: InvoiceData): void {
   doc.text(formatCurrencyPDF(invoice.subtotal), pageWidth - margin - 5, yPos, { align: 'right' })
   yPos += 7
 
-  const taxRateLabel = invoice.taxRate ? `TVA (${invoice.taxRate}%) :` : 'TVA :'
-  doc.text(taxRateLabel, totalsX, yPos, { align: 'right' })
-  doc.text(formatCurrencyPDF(invoice.tax), pageWidth - margin - 5, yPos, { align: 'right' })
+  if (invoice.taxRate === 0 && (invoice as any).taxExemptionText) {
+    doc.text((invoice as any).taxExemptionText, totalsX, yPos, { align: 'right' })
+    doc.text(formatCurrencyPDF(invoice.tax), pageWidth - margin - 5, yPos, { align: 'right' })
+  } else {
+    const taxRateLabel = invoice.taxRate ? `TVA (${invoice.taxRate}%) :` : 'TVA :'
+    doc.text(taxRateLabel, totalsX, yPos, { align: 'right' })
+    doc.text(formatCurrencyPDF(invoice.tax), pageWidth - margin - 5, yPos, { align: 'right' })
+  }
   yPos += 10
 
   // Calculer la largeur du texte pour ajuster le rectangle

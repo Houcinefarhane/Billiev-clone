@@ -145,7 +145,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { clientId, date, dueDate, subtotal, taxRate, tax, total, notes, items } = body
+    const { clientId, date, dueDate, subtotal, taxRate, tax, total, notes, taxExemptionText, items } = body
 
     console.log('Creating invoice with data:', { clientId, date, itemsCount: items?.length })
 
@@ -228,6 +228,7 @@ export async function POST(request: Request) {
         subtotal: parseFloat(subtotal),
         taxRate: taxRate ? parseFloat(taxRate) : 20, // Par défaut 20% si non fourni
         tax: parseFloat(tax),
+        taxExemptionText: taxExemptionText || null,
         total: parseFloat(total),
         notes: notes || null,
         status: 'draft',

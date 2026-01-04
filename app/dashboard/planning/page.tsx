@@ -1121,24 +1121,13 @@ export default function PlanningPage() {
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="time">Heure * (8:00 - 18:00)</Label>
+                        <Label htmlFor="time">Heure *</Label>
                         <Input
                           id="time"
                           type="time"
-                          min="08:00"
-                          max="18:00"
                           value={formData.time}
                           onChange={(e) => {
-                            const time = e.target.value
-                            const [hours, minutes] = time.split(':').map(Number)
-                            
-                            // Validation : entre 8:00 et 18:00
-                            if (hours < 8 || hours > 18 || (hours === 18 && minutes > 0)) {
-                              alert('L\'heure doit être entre 8:00 et 18:00')
-                              return
-                            }
-                            
-                            setFormData({ ...formData, time })
+                            setFormData({ ...formData, time: e.target.value })
                           }}
                           required
                           className="h-10"

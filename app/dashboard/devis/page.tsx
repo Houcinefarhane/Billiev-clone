@@ -29,6 +29,7 @@ interface Quote {
   tax: number
   total: number
   notes: string | null
+  taxExemptionText?: string | null
   client: {
     id: string
     firstName: string
@@ -67,6 +68,7 @@ export default function DevisPage() {
     date: new Date().toISOString().split('T')[0],
     validUntil: '',
     taxRate: '20', // Taux de TVA en pourcentage
+    taxExemptionText: '', // Texte pour TVA non applicable
     notes: '',
     items: [{ description: '', quantity: 1, unitPrice: 0, total: 0 }] as QuoteItem[],
   })
@@ -181,6 +183,7 @@ export default function DevisPage() {
       date: quote.date.split('T')[0],
       validUntil: quote.validUntil ? quote.validUntil.split('T')[0] : '',
       taxRate: String(quote.taxRate || 20),
+      taxExemptionText: (quote as any).taxExemptionText || '',
       notes: quote.notes || '',
       items: quote.items.length > 0 
         ? quote.items.map(item => ({
@@ -221,6 +224,7 @@ export default function DevisPage() {
       taxRate: parseFloat(formData.taxRate),
       tax,
       total,
+      taxExemptionText: formData.taxRate === '0' ? formData.taxExemptionText : null,
       notes: formData.notes || null,
       items: validItems.map(item => ({
         description: item.description.trim(),
@@ -260,6 +264,7 @@ export default function DevisPage() {
       date: new Date().toISOString().split('T')[0],
       validUntil: '',
       taxRate: '20',
+      taxExemptionText: '',
       notes: '',
       items: [{ description: '', quantity: 1, unitPrice: 0, total: 0 }],
     })
@@ -719,13 +724,27 @@ export default function DevisPage() {
                             <select
                               id="taxRate"
                               value={formData.taxRate}
-                              onChange={(e) => setFormData({ ...formData, taxRate: e.target.value })}
+                              onChange={(e) => setFormData({ ...formData, taxRate: e.target.value, taxExemptionText: e.target.value === '0' ? formData.taxExemptionText : '' })}
                               className="flex h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                             >
+                              <option value="0">0%</option>
                               <option value="5">5%</option>
                               <option value="10">10%</option>
                               <option value="20">20%</option>
                             </select>
+                          </div>
+                          {formData.taxRate === '0' && (
+                            <div className="space-y-2">
+                              <Label htmlFor="taxExemptionText">Mention TVA non applicable</Label>
+                              <Input
+                                id="taxExemptionText"
+                                value={formData.taxExemptionText}
+                                onChange={(e) => setFormData({ ...formData, taxExemptionText: e.target.value })}
+                                placeholder="Ex: TVA non applicable article 261-4-4 du CGI"
+                                className="h-11"
+                              />
+                            </div>
+                          )}
                           </div>
                         </div>
 
@@ -804,10 +823,19 @@ export default function DevisPage() {
                             <span className="text-muted-foreground">Total HT:</span>
                             <span className="font-semibold">{formatCurrency(calculateTotals(formData.items, parseFloat(formData.taxRate)).subtotal)}</span>
                           </div>
-                          <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">TVA ({formData.taxRate}%):</span>
-                            <span className="font-semibold">{formatCurrency(calculateTotals(formData.items, parseFloat(formData.taxRate)).tax)}</span>
-                          </div>
+                          {formData.taxRate === '0' ? (
+                            formData.taxExemptionText ? (
+                              <div className="flex justify-between text-sm">
+                                <span className="text-muted-foreground">{formData.taxExemptionText}:</span>
+                                <span className="font-semibold">{formatCurrency(calculateTotals(formData.items, parseFloat(formData.taxRate)).tax)}</span>
+                              </div>
+                            ) : null
+                          ) : (
+                            <div className="flex justify-between text-sm">
+                              <span className="text-muted-foreground">TVA ({formData.taxRate}%):</span>
+                              <span className="font-semibold">{formatCurrency(calculateTotals(formData.items, parseFloat(formData.taxRate)).tax)}</span>
+                            </div>
+                          )}
                           <div className="flex justify-between text-xl font-bold pt-3 border-t-2 border-primary/30">
                             <span>Total TTC:</span>
                             <span className="text-primary">{formatCurrency(calculateTotals(formData.items, parseFloat(formData.taxRate)).total)}</span>
@@ -959,8 +987,17 @@ export default function DevisPage() {
                           <span className="font-semibold">{formatCurrency(selectedQuote.subtotal)}</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">TVA ({selectedQuote.taxRate || 20}%):</span>
-                          <span className="font-semibold">{formatCurrency(selectedQuote.tax)}</span>
+                          {selectedQuote.taxRate === 0 && selectedQuote.taxExemptionText ? (
+                            <>
+                              <span className="text-muted-foreground">{selectedQuote.taxExemptionText}:</span>
+                              <span className="font-semibold">{formatCurrency(selectedQuote.tax)}</span>
+                            </>
+                          ) : (
+                            <>
+                              <span className="text-muted-foreground">TVA ({selectedQuote.taxRate || 20}%):</span>
+                              <span className="font-semibold">{formatCurrency(selectedQuote.tax)}</span>
+                            </>
+                          )}
                         </div>
                         <div className="flex justify-between text-xl font-bold pt-3 border-t-2 border-primary/30">
                           <span>Total TTC:</span>

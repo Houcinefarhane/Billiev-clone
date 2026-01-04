@@ -91,6 +91,9 @@ export async function PUT(
       updateData.taxRate = parseFloat(taxRate)
       updateData.tax = parseFloat(tax)
       updateData.total = parseFloat(total)
+      if ('taxExemptionText' in body) {
+        updateData.taxExemptionText = body.taxExemptionText || null
+      }
     }
 
     const quote = await prisma.quote.update({

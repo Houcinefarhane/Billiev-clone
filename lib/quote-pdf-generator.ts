@@ -305,10 +305,17 @@ export function generateQuotePDF(quote: QuoteData): void {
   doc.text(subtotalValue, pageWidth - margin - 5, yPos, { align: 'right' })
   yPos += 6
 
-  const taxLabel = `TVA (${quote.taxRate}%)`
-  const taxValue = formatCurrencyPDF(quote.tax)
-  doc.text(taxLabel, subtotalX, yPos, { align: 'right' })
-  doc.text(taxValue, pageWidth - margin - 5, yPos, { align: 'right' })
+  if (quote.taxRate === 0 && (quote as any).taxExemptionText) {
+    const taxLabel = (quote as any).taxExemptionText
+    const taxValue = formatCurrencyPDF(quote.tax)
+    doc.text(taxLabel, subtotalX, yPos, { align: 'right' })
+    doc.text(taxValue, pageWidth - margin - 5, yPos, { align: 'right' })
+  } else {
+    const taxLabel = `TVA (${quote.taxRate}%)`
+    const taxValue = formatCurrencyPDF(quote.tax)
+    doc.text(taxLabel, subtotalX, yPos, { align: 'right' })
+    doc.text(taxValue, pageWidth - margin - 5, yPos, { align: 'right' })
+  }
   yPos += 8
 
   // Total TTC avec fond coloré
