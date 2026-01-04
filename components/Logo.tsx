@@ -46,11 +46,14 @@ export function Logo({ className = '', size = 'md', showText = true }: LogoProps
           priority
         />
       ) : (
-        <div className="w-20 h-20 rounded-xl relative overflow-hidden shadow-lg" style={{ background: 'linear-gradient(135deg, #4a90e2 0%, #96b9dc 100%)' }}>
-          <div className="absolute top-0 right-0 w-5 h-5" style={{ backgroundColor: '#96b9dc' }}>
-            <div className="absolute top-0 right-0 w-0 h-0 border-l-[10px] border-l-transparent border-b-[10px] border-b-white"></div>
+        <div 
+          className={`rounded-xl relative overflow-hidden shadow-lg ${size === 'sm' ? 'w-8 h-8' : size === 'md' ? 'w-10 h-10' : 'w-16 h-16'}`}
+          style={{ background: 'linear-gradient(135deg, #4a90e2 0%, #96b9dc 100%)' }}
+        >
+          <div className={`absolute top-0 right-0 ${size === 'sm' ? 'w-3 h-3' : size === 'md' ? 'w-4 h-4' : 'w-5 h-5'}`} style={{ backgroundColor: '#96b9dc' }}>
+            <div className={`absolute top-0 right-0 w-0 h-0 border-l-transparent border-b-white ${size === 'sm' ? 'border-l-[6px] border-b-[6px]' : size === 'md' ? 'border-l-[8px] border-b-[8px]' : 'border-l-[10px] border-b-[10px]'}`}></div>
           </div>
-          <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-4xl">B</span>
+          <span className={`absolute inset-0 flex items-center justify-center text-white font-bold ${size === 'sm' ? 'text-lg' : size === 'md' ? 'text-2xl' : 'text-3xl'}`}>B</span>
         </div>
       )}
     </div>
