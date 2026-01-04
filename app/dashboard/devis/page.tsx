@@ -733,20 +733,19 @@ export default function DevisPage() {
                               <option value="20">20%</option>
                             </select>
                           </div>
-                          {formData.taxRate === '0' && (
-                            <div className="space-y-2">
-                              <Label htmlFor="taxExemptionText">Mention TVA non applicable</Label>
-                              <Input
-                                id="taxExemptionText"
-                                value={formData.taxExemptionText}
-                                onChange={(e) => setFormData({ ...formData, taxExemptionText: e.target.value })}
-                                placeholder="Ex: TVA non applicable article 261-4-4 du CGI"
-                                className="h-11"
-                              />
-                            </div>
-                          )}
-                          </div>
                         </div>
+                        {formData.taxRate === '0' && (
+                          <div className="space-y-2">
+                            <Label htmlFor="taxExemptionText">Mention TVA non applicable</Label>
+                            <Input
+                              id="taxExemptionText"
+                              value={formData.taxExemptionText}
+                              onChange={(e) => setFormData({ ...formData, taxExemptionText: e.target.value })}
+                              placeholder="Ex: TVA non applicable article 261-4-4 du CGI"
+                              className="h-11"
+                            />
+                          </div>
+                        )}
 
                         <div className="space-y-4">
                           <div className="flex items-center justify-between">

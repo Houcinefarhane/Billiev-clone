@@ -701,32 +701,31 @@ export default function FacturesPage() {
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="taxRate">Taux de TVA</Label>
-                            <select
-                              id="taxRate"
-                              value={formData.taxRate}
-                              onChange={(e) => setFormData({ ...formData, taxRate: e.target.value, taxExemptionText: e.target.value === '0' ? formData.taxExemptionText : '' })}
-                              className="flex h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                            >
-                              <option value="0">0%</option>
-                              <option value="5">5%</option>
-                              <option value="10">10%</option>
-                              <option value="20">20%</option>
-                            </select>
-                      </div>
-                      {formData.taxRate === '0' && (
-                        <div className="space-y-2">
-                          <Label htmlFor="taxExemptionText">Mention TVA non applicable</Label>
-                          <Input
-                            id="taxExemptionText"
-                            value={formData.taxExemptionText}
-                            onChange={(e) => setFormData({ ...formData, taxExemptionText: e.target.value })}
-                            placeholder="Ex: TVA non applicable article 261-4-4 du CGI"
-                            className="h-11"
-                          />
-                        </div>
-                      )}
+                        <select
+                          id="taxRate"
+                          value={formData.taxRate}
+                          onChange={(e) => setFormData({ ...formData, taxRate: e.target.value, taxExemptionText: e.target.value === '0' ? formData.taxExemptionText : '' })}
+                          className="flex h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        >
+                          <option value="0">0%</option>
+                          <option value="5">5%</option>
+                          <option value="10">10%</option>
+                          <option value="20">20%</option>
+                        </select>
                       </div>
                     </div>
+                    {formData.taxRate === '0' && (
+                      <div className="space-y-2">
+                        <Label htmlFor="taxExemptionText">Mention TVA non applicable</Label>
+                        <Input
+                          id="taxExemptionText"
+                          value={formData.taxExemptionText}
+                          onChange={(e) => setFormData({ ...formData, taxExemptionText: e.target.value })}
+                          placeholder="Ex: TVA non applicable article 261-4-4 du CGI"
+                          className="h-11"
+                        />
+                      </div>
+                    )}
 
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
