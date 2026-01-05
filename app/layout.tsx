@@ -13,14 +13,14 @@ const spaceGrotesk = Space_Grotesk({
 
 export const metadata: Metadata = {
   title: {
-    default: 'Billiev - ERP Complet',
-    template: '%s | Billiev',
+    default: 'ERP Complet - Solution de Gestion',
+    template: '%s | ERP Complet',
   },
   description: 'ERP complet pour gérer l\'ensemble de votre entreprise : clients, factures, devis, stock, planning, finances et analytics en temps réel.',
   keywords: ['dashboard', 'gestion', 'factures', 'devis', 'planning', 'clients', 'finances', 'stock', 'analytics'],
-  authors: [{ name: 'Billiev' }],
-  creator: 'Billiev',
-  publisher: 'Billiev',
+  authors: [{ name: 'ERP Complet' }],
+  creator: 'ERP Complet',
+  publisher: 'ERP Complet',
   formatDetection: {
     email: false,
     address: false,
@@ -35,13 +35,13 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'fr_FR',
     url: '/',
-    title: 'Billiev - ERP Complet',
+    title: 'ERP Complet - Solution de Gestion',
     description: 'ERP complet pour gérer l\'ensemble de votre entreprise : clients, factures, devis, stock, planning, finances et analytics en temps réel.',
-    siteName: 'Billiev',
+    siteName: 'ERP Complet',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Billiev - ERP Complet',
+    title: 'ERP Complet - Solution de Gestion',
     description: 'Solution ERP complète pour gérer votre entreprise',
   },
   robots: {
@@ -59,7 +59,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Billiev',
+    title: 'ERP Complet',
   },
   icons: {
     icon: '/favicon.ico',
