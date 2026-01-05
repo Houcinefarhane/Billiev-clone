@@ -1,0 +1,10 @@
+import requests
+from bs4 import BeautifulSoup
+
+recherches = [
+    "plombier alès",
+    "electricien alès", 
+    "menuisier alès",
+    # ... etc
+]
+
